@@ -65,7 +65,7 @@
                     <div class="flex gap-3 text-gray-600"><i class="fa-solid fa-envelope text-gray-400 w-4 mt-1 text-center"></i> <div id="prof-email" class="break-all">-</div></div>
                     <div class="flex gap-3 items-center text-gray-600 mt-4 pt-4 border-t border-gray-50">
                         <i class="fa-solid fa-id-card text-gray-400 w-4 text-center"></i> 
-                        <div>Scopus ID: <span class="text-red-600 font-medium" id="prof-scopus">-</span></div>
+                        <div class="flex items-center gap-1">Scopus ID: <span class="text-red-600 font-medium" id="prof-scopus">-</span></div>
                     </div>
                 </div>
             </div>
@@ -117,8 +117,8 @@
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
         const TABLE_NAME = 'นักวิจัย'; 
 
-        // 🔴🔴🔴 นำ SCOPUS API KEY มาใส่ตรงนี้ครับ 🔴🔴🔴
-        const SCOPUS_API_KEY = 'ใส่_API_KEY_จาก_ELSEVIER_ตรงนี้';
+        // 🟢 นำ SCOPUS API KEY มาใส่เรียบร้อยแล้ว 🟢
+        const SCOPUS_API_KEY = '233469672124ca85d252ec13abe9ced5';
 
         let globalResearchersData = []; 
 
@@ -205,10 +205,8 @@
             const title = person['ตำแหน่งทางวิชาการ'] || '';
             const status = person['สถานะ'] || '';
             
-            // ---> จุดที่แก้ไข: เช็คสีของสถานะ <---
             let statusHtml = '';
             if (status) {
-                // ถ้าสถานะคือ "ทำงานปกติ" ให้เป็นสีเขียว ถ้าไม่ใช่ให้เป็นสีแดง
                 if (status.trim() === 'ทำงานปกติ') {
                     statusHtml = `<span class="text-emerald-600 font-medium">${status}</span>`;
                 } else {
@@ -216,7 +214,6 @@
                 }
             }
             
-            // นำตำแหน่งและสถานะมารวมกัน
             if (title && statusHtml) {
                 document.getElementById('prof-title').innerHTML = `${title} <span class="mx-1 text-gray-300">•</span> ${statusHtml}`;
             } else {
@@ -228,7 +225,14 @@
             document.getElementById('prof-email').innerText = person['E-Mail'] || '-';
             
             const scopusId = person['ScopusAuthorID'] || '';
-            document.getElementById('prof-scopus').innerText = scopusId || 'ไม่มีข้อมูล';
+            const scopusContainer = document.getElementById('prof-scopus');
+            
+            if (scopusId && scopusId.toString().trim() !== '-' && scopusId.toString().trim() !== 'ไม่มีข้อมูล') {
+                const cleanId = scopusId.toString().trim();
+                scopusContainer.innerHTML = `<a href="https://www.scopus.com/authid/detail.uri?authorId=${cleanId}" target="_blank" class="hover:underline hover:text-red-800 transition-colors inline-flex items-center gap-1" title="เปิดหน้าโปรไฟล์บน Scopus">${cleanId} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>`;
+            } else {
+                scopusContainer.innerText = 'ไม่มีข้อมูล';
+            }
 
             const profileImageContainer = document.getElementById('prof-image-container');
             const bigImgUrl = getAppSheetImageUrl(person['รูปภาพ']);
@@ -255,7 +259,7 @@
 
         async function fetchScopusPublications(scopusId) {
             const pubList = document.getElementById('pub-list');
-            if (!scopusId || scopusId.trim() === '-' || scopusId.trim() === 'ไม่มีข้อมูล') {
+            if (!scopusId || scopusId.toString().trim() === '-' || scopusId.toString().trim() === 'ไม่มีข้อมูล') {
                 pubList.innerHTML = `<tr><td class="py-10 text-center text-gray-400 bg-gray-50 rounded-lg">ไม่มีข้อมูล Scopus ID</td></tr>`;
                 return;
             }
@@ -263,7 +267,7 @@
 
             const currentYear = new Date().getFullYear();
             const startYear = currentYear - 3; 
-            const query = `AU-ID(${scopusId.trim()}) AND PUBYEAR > ${startYear - 1}`;
+            const query = `AU-ID(${scopusId.toString().trim()}) AND PUBYEAR > ${startYear - 1}`;
             const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&sort=-coverDate`;
 
             try {
@@ -306,7 +310,7 @@
                     `;
                 });
             } catch {
-                pubList.innerHTML = `<tr><td class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-sm border border-red-100"><i class="fa-solid fa-triangle-exclamation mb-2 text-xl block"></i>โปรดใส่ Scopus API Key<br><span class="text-xs text-gray-600">ที่บรรทัดที่ 113 ของโค้ด</span></td></tr>`;
+                pubList.innerHTML = `<tr><td class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-sm border border-red-100"><i class="fa-solid fa-triangle-exclamation mb-2 text-xl block"></i>โปรดตรวจสอบ Scopus API Key อีกครั้ง</td></tr>`;
             }
         }
 
@@ -346,11 +350,6 @@
 
             if (validIds.length === 0) {
                 container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-400">ไม่พบข้อมูล Scopus ID ของนักวิจัยในระบบ</td></tr>`;
-                return;
-            }
-
-            if (SCOPUS_API_KEY === 'ใส่_API_KEY_จาก_ELSEVIER_ตรงนี้' || SCOPUS_API_KEY === '') {
-                container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-red-500 bg-red-50 border border-red-100 rounded-lg"><i class="fa-solid fa-triangle-exclamation mb-2 text-xl block"></i>โปรดใส่ Scopus API Key ที่บรรทัด 113 ก่อนใช้งานฟังก์ชันนี้</td></tr>`;
                 return;
             }
 
