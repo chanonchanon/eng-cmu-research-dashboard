@@ -341,7 +341,7 @@
             fetchScopusPublications(scopusId);
         }
 
-        // 🟢 ฟังก์ชันใหม่: ดึงข้อมูลสรุปผลงานวิจัย (Metrics) แก้ไขเพื่อเสถียรภาพสูงสุด 🟢
+        // 🟢 ฟังก์ชันใหม่: ดึงข้อมูลสรุปผลงานวิจัย (Metrics) 🟢
         async function fetchScopusMetrics(scopusId) {
             const grid = document.getElementById('prof-metrics-grid');
             const dateLabel = document.getElementById('metrics-updated-date');
@@ -359,32 +359,25 @@
             `;
 
             try {
-                let data;
-                const targetUrl = `https://api.elsevier.com/content/author/author_id/${scopusId}?view=STANDARD`;
+                // เรียกใช้ Author Retrieval API เพื่อดึงตัวเลขสถิติ
+                const url = `https://api.elsevier.com/content/author/author_id/${scopusId}?view=metrics`;
+                const response = await fetch(url, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' } });
                 
-                try {
-                    // ขั้นแรก: พยายามดึงโดยตรงผ่าน API ก่อน
-                    const response = await fetch(targetUrl, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' } });
-                    if (!response.ok) throw new Error();
-                    data = await response.json();
-                } catch (directErr) {
-                    // ขั้นสอง: กรณี API โดนบล็อก (CORS หรือ 403) ให้ใช้ Proxy ช่วยดึงข้อมูลอัตโนมัติ
-                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl + '&apiKey=' + SCOPUS_API_KEY + '&httpAccept=application/json')}`;
-                    const proxyResponse = await fetch(proxyUrl);
-                    const proxyData = await proxyResponse.json();
-                    data = JSON.parse(proxyData.contents);
-                }
-
                 if (currentActiveScopusId !== scopusId) return; 
+
+                if (!response.ok) throw new Error();
+                const data = await response.json();
                 
+                // ตรวจสอบและดึงข้อมูลออกมา
                 const authorArray = data['author-retrieval-response'];
                 const authorData = Array.isArray(authorArray) ? authorArray[0] : authorArray;
 
                 const docCount = authorData?.coredata?.['document-count'] || '0';
-                const citationCount = authorData?.coredata?.['citation-count'] || authorData?.coredata?.['cited-by-count'] || '0';
+                const citationCount = authorData?.coredata?.['citation-count'] || '0';
                 const hIndex = authorData?.['h-index'] || '0';
                 const coAuthorCount = authorData?.['coauthor-count'] || '0';
 
+                // จัดการรูปแบบวันที่
                 const today = new Date();
                 const dateStr = today.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
                 dateLabel.innerText = `อัปเดตล่าสุด ${dateStr}`;
