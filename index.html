@@ -9,17 +9,22 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
         body { font-family: 'Prompt', sans-serif; background-color: #f8f9fa; }
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden text-gray-800">
+<body class="flex h-screen overflow-hidden text-gray-800 relative">
 
-    <aside class="w-64 bg-white border-r flex flex-col shadow-sm z-10 flex-shrink-0">
-        <div class="h-16 flex items-center px-6 border-b border-gray-100">
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden transition-opacity"></div>
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 transition duration-300 ease-in-out z-50 w-64 bg-white border-r flex flex-col shadow-2xl lg:shadow-sm flex-shrink-0">
+        <div class="h-16 flex items-center justify-between px-6 border-b border-gray-100">
             <span class="text-2xl font-bold text-red-700"><i class="fa-solid fa-gear"></i> RiSAO</span>
+            <button id="close-sidebar-btn" class="lg:hidden text-gray-400 hover:text-red-700 text-xl focus:outline-none">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
         <nav class="flex-1 px-4 py-6 space-y-2">
             <a href="#" id="menu-dashboard" class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
@@ -34,48 +39,51 @@
         </nav>
     </aside>
 
-    <main class="flex-1 flex flex-col min-w-0">
-        <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-0 flex-shrink-0">
-            <div class="relative w-1/2 max-w-md">
+    <main class="flex-1 flex flex-col min-w-0 w-full">
+        <header class="h-16 bg-white shadow-sm flex items-center px-4 lg:px-6 z-0 flex-shrink-0 gap-3">
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-500 hover:text-red-700 focus:outline-none p-1">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="relative w-full lg:w-1/2 max-w-md">
                 <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 <input type="text" id="search-input" placeholder="ค้นหานักวิจัย, ภาควิชา, คำสำคัญ..." class="w-full bg-gray-100 rounded-full pl-11 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-shadow">
             </div>
         </header>
 
-        <div id="view-researchers" class="flex-1 p-6 flex gap-6 overflow-hidden">
+        <div id="view-researchers" class="flex-1 p-4 lg:p-6 flex flex-col lg:flex-row gap-4 lg:gap-6 overflow-y-auto lg:overflow-hidden">
             
-            <div class="w-1/4 min-w-[250px] max-w-[300px] bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-shrink-0">
-                <div class="p-4 border-b border-gray-100 font-medium text-gray-700">รายชื่อนักวิจัย</div>
+            <div class="w-full lg:w-1/4 lg:min-w-[250px] lg:max-w-[300px] h-[40vh] lg:h-auto bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-shrink-0">
+                <div class="p-3 lg:p-4 border-b border-gray-100 font-medium text-gray-700 text-sm lg:text-base">รายชื่อนักวิจัย</div>
                 <div class="flex-1 overflow-y-auto p-2" id="researcher-list">
                     <div class="text-center text-gray-400 text-sm mt-10"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังโหลดข้อมูล...</div>
                 </div>
             </div>
 
-            <div class="w-1/3 min-w-[300px] max-w-[400px] bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center overflow-y-auto flex-shrink-0">
-                <div id="prof-image-container" class="w-32 h-32 rounded-full border-4 border-red-100 mb-4 overflow-hidden bg-gray-200 flex items-center justify-center text-gray-400 text-4xl shadow-sm">
+            <div id="profile-section" class="w-full lg:w-1/3 lg:min-w-[300px] lg:max-w-[400px] bg-white rounded-xl shadow-sm border border-gray-100 p-5 lg:p-6 flex flex-col items-center text-center lg:overflow-y-auto flex-shrink-0">
+                <div id="prof-image-container" class="w-24 h-24 lg:w-32 lg:h-32 rounded-full border-4 border-red-100 mb-3 lg:mb-4 overflow-hidden bg-gray-200 flex items-center justify-center text-gray-400 text-3xl lg:text-4xl shadow-sm">
                     <i class="fa-solid fa-user"></i>
                 </div>
-                <h2 class="text-xl font-bold text-gray-800 mb-1" id="prof-name-th">-</h2>
-                <div class="text-gray-500 text-sm mb-2" id="prof-name-en">-</div>
-                <div class="text-xs text-gray-500 mb-6 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100" id="prof-title">-</div>
+                <h2 class="text-lg lg:text-xl font-bold text-gray-800 mb-1" id="prof-name-th">-</h2>
+                <div class="text-gray-500 text-xs lg:text-sm mb-2" id="prof-name-en">-</div>
+                <div class="text-[11px] lg:text-xs text-gray-500 mb-4 lg:mb-6 bg-gray-50 px-3 lg:px-4 py-1.5 rounded-full border border-gray-100" id="prof-title">-</div>
                 
-                <div class="w-full text-left space-y-4 text-sm border-t border-gray-100 pt-6">
+                <div class="w-full text-left space-y-3 lg:space-y-4 text-[13px] lg:text-sm border-t border-gray-100 pt-4 lg:pt-6">
                     <div class="flex gap-3 text-gray-600"><i class="fa-solid fa-building text-gray-400 w-4 mt-1 text-center"></i> <div id="prof-dept">-</div></div>
                     <div class="flex gap-3 text-gray-600"><i class="fa-solid fa-phone text-gray-400 w-4 mt-1 text-center"></i> <div id="prof-phone">-</div></div>
                     <div class="flex gap-3 text-gray-600"><i class="fa-solid fa-envelope text-gray-400 w-4 mt-1 text-center"></i> <div id="prof-email" class="break-all">-</div></div>
-                    <div class="flex gap-3 items-center text-gray-600 mt-4 pt-4 border-t border-gray-50">
+                    <div class="flex gap-3 items-center text-gray-600 mt-3 pt-3 lg:mt-4 lg:pt-4 border-t border-gray-50">
                         <i class="fa-solid fa-id-card text-gray-400 w-4 text-center"></i> 
                         <div class="flex items-center gap-1">Scopus ID: <span class="text-red-600 font-medium" id="prof-scopus">-</span></div>
                     </div>
                 </div>
             </div>
 
-            <div class="flex-1 min-w-[350px] bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col overflow-hidden">
-                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 flex-shrink-0">
-                    <h3 class="font-medium text-gray-800">ผลงานตีพิมพ์ 3 ปีล่าสุด (ส่วนบุคคล)</h3>
+            <div class="w-full lg:flex-1 lg:min-w-[350px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-5 flex flex-col lg:overflow-hidden min-h-[400px] lg:min-h-0">
+                <div class="flex justify-between items-center mb-3 lg:mb-4 pb-2 border-b border-gray-100 flex-shrink-0">
+                    <h3 class="font-medium text-gray-800 text-sm lg:text-base">ผลงานตีพิมพ์ 3 ปีล่าสุด</h3>
                 </div>
-                <div class="overflow-y-auto flex-1 pr-2">
-                    <table class="w-full text-sm text-left">
+                <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
+                    <table class="w-full text-sm text-left min-w-[300px]">
                         <tbody id="pub-list">
                             <tr><td class="py-10 text-center text-gray-400">คลิกที่รายชื่อนักวิจัยเพื่อดูผลงาน</td></tr>
                         </tbody>
@@ -84,18 +92,18 @@
             </div>
         </div>
 
-        <div id="view-publications" class="flex-1 p-6 overflow-hidden hidden flex flex-col">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-full overflow-hidden">
-                <div class="flex justify-between items-center mb-4 pb-3 border-b flex-shrink-0">
-                    <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมดของคณะวิศวกรรมศาสตร์ (2 ปีย้อนหลัง)</h3>
-                    <span class="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span>
+        <div id="view-publications" class="flex-1 p-4 lg:p-6 overflow-hidden hidden flex flex-col">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-6 flex flex-col h-full overflow-hidden">
+                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
+                    <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมดของคณะวิศวกรรมศาสตร์ (2 ปีย้อนหลัง)</h3>
+                    <span class="text-[10px] lg:text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full self-start lg:self-auto">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span>
                 </div>
-                <div class="overflow-y-auto flex-1 pr-2">
-                    <table class="w-full text-sm text-left border-collapse">
+                <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
+                    <table class="w-full text-sm text-left border-collapse min-w-[600px] lg:min-w-full">
                         <thead class="sticky top-0 bg-white z-10 shadow-sm shadow-gray-50">
-                            <tr class="text-gray-400 border-b border-gray-100">
+                            <tr class="text-gray-400 border-b border-gray-100 text-xs lg:text-sm">
                                 <th class="pb-3 font-medium pl-2 w-3/5">ชื่องานตีพิมพ์ (TITLE)</th>
-                                <th class="pb-3 font-medium w-1/4">นักวิจัยในคณะ (RESEARCHER)</th>
+                                <th class="pb-3 font-medium w-1/4">นักวิจัยในคณะ</th>
                                 <th class="pb-3 font-medium w-20 text-center">ลิงก์</th>
                             </tr>
                         </thead>
@@ -111,13 +119,37 @@
 
     <script>
         // ==========================================
+        // 0. ระบบเมนูมือถือ (Mobile Sidebar Toggle)
+        // ==========================================
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const closeBtn = document.getElementById('close-sidebar-btn');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        mobileBtn.onclick = toggleSidebar;
+        closeBtn.onclick = toggleSidebar;
+        overlay.onclick = toggleSidebar;
+
+        // ปิดเมนูอัตโนมัติเวลาจิ้มเลือกเมนูบนมือถือ
+        document.querySelectorAll('#sidebar nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if(window.innerWidth < 1024) toggleSidebar();
+            });
+        });
+
+        // ==========================================
         // 1. ตั้งค่า API และตัวแปรระบบ
         // ==========================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbzMQCzrpCaXKUyRoZjBF0he-8OrAgKPtmK1zIEiTer-G4kGhDWrvR-3HrEech436VKu/exec';
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
         const TABLE_NAME = 'นักวิจัย'; 
 
-        // 🟢 นำ SCOPUS API KEY มาใส่เรียบร้อยแล้ว 🟢
+        // 🔴 นำ SCOPUS API KEY มาใส่เรียบร้อยแล้ว
         const SCOPUS_API_KEY = '233469672124ca85d252ec13abe9ced5';
 
         let globalResearchersData = []; 
@@ -141,46 +173,44 @@
 
             dataToRender.forEach(person => {
                 const div = document.createElement('div');
-                div.className = "flex items-center p-3 hover:bg-red-50 rounded-lg cursor-pointer border-l-4 border-transparent hover:border-red-600 mb-2 transition-all duration-200";
+                div.className = "flex items-center p-2.5 lg:p-3 hover:bg-red-50 rounded-lg cursor-pointer border-l-4 border-transparent hover:border-red-600 mb-2 transition-all duration-200";
                 
                 const imgUrl = getAppSheetImageUrl(person['รูปภาพ']);
                 const imageHTML = imgUrl 
                     ? `<img src="${imgUrl}" alt="profile" class="w-full h-full object-cover">`
-                    : `<i class="fa-solid fa-user"></i>`;
+                    : `<i class="fa-solid fa-user text-sm"></i>`;
 
                 div.innerHTML = `
-                    <div class="w-11 h-11 rounded-full bg-gray-200 mr-3 overflow-hidden flex-shrink-0 flex items-center justify-center text-gray-400 shadow-sm border border-gray-100">
+                    <div class="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-gray-200 mr-3 overflow-hidden flex-shrink-0 flex items-center justify-center text-gray-400 shadow-sm border border-gray-100">
                         ${imageHTML}
                     </div>
                     <div class="overflow-hidden w-full">
-                        <div class="text-sm font-semibold truncate text-gray-800">${person['ชื่อ-สกุล'] || 'ไม่มีชื่อ'}</div>
-                        <div class="text-xs text-gray-500 truncate mt-0.5">${person['ภาควิชา'] || '-'}</div>
+                        <div class="text-[13px] lg:text-sm font-semibold truncate text-gray-800">${person['ชื่อ-สกุล'] || 'ไม่มีชื่อ'}</div>
+                        <div class="text-[11px] lg:text-xs text-gray-500 truncate mt-0.5">${person['ภาควิชา'] || '-'}</div>
                     </div>
                 `;
 
-                div.onclick = () => updateProfile(person, div);
+                div.onclick = () => updateProfile(person, div, true);
                 listContainer.appendChild(div);
             });
 
+            // ไม่ต้องเลื่อนจอเวลาโหลดข้อมูลครั้งแรก
             if (dataToRender.length > 0) {
-                updateProfile(dataToRender[0], listContainer.firstChild);
+                updateProfile(dataToRender[0], listContainer.firstChild, false);
             }
         }
 
         document.getElementById('search-input').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase().trim();
-            
             if (searchTerm === '') {
                 renderResearcherList(globalResearchersData);
                 return;
             }
-
             const filteredData = globalResearchersData.filter(person => {
                 const name = (person['ชื่อ-สกุล'] || '').toLowerCase();
                 const dept = (person['ภาควิชา'] || '').toLowerCase();
                 return name.includes(searchTerm) || dept.includes(searchTerm);
             });
-
             renderResearcherList(filteredData);
         });
 
@@ -190,7 +220,6 @@
                 globalResearchersData = await response.json(); 
                 renderResearcherList(globalResearchersData);
             } catch (error) {
-                console.error('Error fetching data:', error);
                 document.getElementById('researcher-list').innerHTML = '<div class="text-red-500 text-sm p-4 text-center mt-5 bg-red-50 rounded-lg border border-red-100">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
             }
         }
@@ -198,7 +227,7 @@
         // ==========================================
         // 3. ระบบแสดงผลโปรไฟล์และ Scopus (ส่วนบุคคล)
         // ==========================================
-        function updateProfile(person, clickedElement) {
+        function updateProfile(person, clickedElement, isUserClick = false) {
             document.getElementById('prof-name-th').innerText = person['ชื่อ-สกุล'] || '-';
             document.getElementById('prof-name-en').innerText = person['Name'] || '-';
             
@@ -238,10 +267,10 @@
             const bigImgUrl = getAppSheetImageUrl(person['รูปภาพ']);
             if (bigImgUrl) {
                 profileImageContainer.innerHTML = `<img src="${bigImgUrl}" alt="Profile" class="w-full h-full object-cover">`;
-                profileImageContainer.classList.remove('bg-gray-200', 'text-gray-400', 'text-4xl');
+                profileImageContainer.classList.remove('bg-gray-200', 'text-gray-400');
             } else {
                 profileImageContainer.innerHTML = `<i class="fa-solid fa-user"></i>`;
-                profileImageContainer.classList.add('bg-gray-200', 'text-gray-400', 'text-4xl');
+                profileImageContainer.classList.add('bg-gray-200', 'text-gray-400');
             }
 
             const allItems = document.getElementById('researcher-list').children;
@@ -252,6 +281,11 @@
             if (clickedElement) {
                 clickedElement.classList.remove('border-transparent');
                 clickedElement.classList.add('bg-red-50', 'border-red-600', 'shadow-sm');
+                
+                // เลื่อนหน้าจอลงมาที่โปรไฟล์อัตโนมัติ (เฉพาะบนมือถือ และเมื่อผู้ใช้เป็นคนกดเอง)
+                if (isUserClick && window.innerWidth < 1024) {
+                    document.getElementById('profile-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
 
             fetchScopusPublications(scopusId);
@@ -260,10 +294,10 @@
         async function fetchScopusPublications(scopusId) {
             const pubList = document.getElementById('pub-list');
             if (!scopusId || scopusId.toString().trim() === '-' || scopusId.toString().trim() === 'ไม่มีข้อมูล') {
-                pubList.innerHTML = `<tr><td class="py-10 text-center text-gray-400 bg-gray-50 rounded-lg">ไม่มีข้อมูล Scopus ID</td></tr>`;
+                pubList.innerHTML = `<tr><td class="py-10 text-center text-gray-400 bg-gray-50 rounded-lg text-sm">ไม่มีข้อมูล Scopus ID</td></tr>`;
                 return;
             }
-            pubList.innerHTML = `<tr><td class="py-10 text-center text-blue-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังค้นหาผลงานจาก Scopus...</td></tr>`;
+            pubList.innerHTML = `<tr><td class="py-10 text-center text-blue-500 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังค้นหาผลงาน...</td></tr>`;
 
             const currentYear = new Date().getFullYear();
             const startYear = currentYear - 3; 
@@ -278,7 +312,7 @@
                 pubList.innerHTML = ''; 
 
                 if (!entries || entries.length === 0) {
-                    pubList.innerHTML = `<tr><td class="py-10 text-center text-gray-400 bg-gray-50 rounded-lg">ไม่พบผลงานบน Scopus<br><span class="text-xs mt-1">(${startYear} - ${currentYear})</span></td></tr>`;
+                    pubList.innerHTML = `<tr><td class="py-10 text-center text-gray-400 bg-gray-50 rounded-lg text-sm">ไม่พบผลงานบน Scopus<br><span class="text-xs mt-1">(${startYear} - ${currentYear})</span></td></tr>`;
                     return;
                 }
 
@@ -296,13 +330,13 @@
 
                     pubList.innerHTML += `
                         <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                            <td class="py-4 pr-3 pl-2">
-                                <div class="font-semibold text-gray-800 text-[13px] mb-1.5">${title}</div>
-                                <div class="text-[12px] text-gray-500 mb-2">
+                            <td class="py-3 lg:py-4 pr-3 pl-2">
+                                <div class="font-semibold text-gray-800 text-[12px] lg:text-[13px] mb-1">${title}</div>
+                                <div class="text-[11px] lg:text-[12px] text-gray-500 mb-2">
                                     <span class="font-medium text-gray-700">${authors}</span> <br>
                                     <span class="italic">${pubName}</span> <span class="font-medium text-gray-600">(${year})</span>
                                 </div>
-                                <a href="${link}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 font-medium px-2 py-1 bg-blue-50 rounded hover:bg-blue-100 transition-colors">
+                                <a href="${link}" target="_blank" class="inline-flex items-center gap-1 text-[10px] lg:text-[11px] text-blue-600 hover:text-blue-800 font-medium px-2 py-1 bg-blue-50 rounded hover:bg-blue-100 transition-colors">
                                     <i class="fa-solid fa-arrow-up-right-from-square"></i> ดูบน Scopus
                                 </a>
                             </td>
@@ -310,7 +344,7 @@
                     `;
                 });
             } catch {
-                pubList.innerHTML = `<tr><td class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-sm border border-red-100"><i class="fa-solid fa-triangle-exclamation mb-2 text-xl block"></i>โปรดตรวจสอบ Scopus API Key อีกครั้ง</td></tr>`;
+                pubList.innerHTML = `<tr><td class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-xs border border-red-100"><i class="fa-solid fa-triangle-exclamation mb-1 text-lg block"></i>โปรดตรวจสอบ Scopus API Key อีกครั้ง</td></tr>`;
             }
         }
 
@@ -342,14 +376,14 @@
 
         async function loadAllFacultyPublications() {
             const container = document.getElementById('all-faculty-pub-list');
-            container.innerHTML = `<tr><td colspan="3" class="py-16 text-center text-blue-600 font-medium"><i class="fa-solid fa-circle-notch fa-spin mr-3 text-lg"></i>กำลังรวบรวมข้อมูลผลงาน 2 ปีย้อนหลังของทั้งคณะ...</td></tr>`;
+            container.innerHTML = `<tr><td colspan="3" class="py-16 text-center text-blue-600 font-medium text-sm"><i class="fa-solid fa-circle-notch fa-spin mr-2 text-lg"></i>กำลังรวบรวมข้อมูล...</td></tr>`;
 
             const validIds = globalResearchersData
                 .map(p => p['ScopusAuthorID'] ? p['ScopusAuthorID'].toString().trim() : '')
                 .filter(id => id !== '' && id !== '-' && id !== 'ไม่มีข้อมูล');
 
             if (validIds.length === 0) {
-                container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-400">ไม่พบข้อมูล Scopus ID ของนักวิจัยในระบบ</td></tr>`;
+                container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-400 text-sm">ไม่พบข้อมูล Scopus ID ของนักวิจัยในระบบ</td></tr>`;
                 return;
             }
 
@@ -394,7 +428,7 @@
                 container.innerHTML = ''; 
 
                 if (uniqueEntries.length === 0) {
-                    container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-400 bg-gray-50 rounded-lg">ไม่พบผลงานตีพิมพ์ในช่วง ${startYear} - ${currentYear}</td></tr>`;
+                    container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-400 bg-gray-50 rounded-lg text-sm">ไม่พบผลงานตีพิมพ์ในช่วง ${startYear} - ${currentYear}</td></tr>`;
                     return;
                 }
 
@@ -433,11 +467,11 @@
 
                     container.innerHTML += `
                         <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
-                            <td class="py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[13.5px]">${title} <span class="text-xs text-gray-400 font-normal ml-1">(${year})</span></td>
-                            <td class="py-4 pr-4 text-sm">${researchersHTML}</td>
-                            <td class="py-4 text-center">
-                                <a href="${scopusLink}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="ดูบน Scopus">
-                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                            <td class="py-3 lg:py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px]">${title} <span class="text-[10px] lg:text-xs text-gray-400 font-normal ml-1">(${year})</span></td>
+                            <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-sm">${researchersHTML}</td>
+                            <td class="py-3 lg:py-4 text-center">
+                                <a href="${scopusLink}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="ดูบน Scopus">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] lg:text-xs"></i>
                                 </a>
                             </td>
                         </tr>
@@ -471,8 +505,11 @@
                         break;
                     }
                 }
-                updateProfile(prof, targetElement);
-                if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                updateProfile(prof, targetElement, true);
+                // บนหน้าจอใหญ่ให้เลื่อนกรอบรายชื่อ บนมือถือฟังก์ชัน updateProfile จัดการเลื่อนหน้าจอหลักให้แล้ว
+                if (targetElement && window.innerWidth >= 1024) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
             }
         }
 
