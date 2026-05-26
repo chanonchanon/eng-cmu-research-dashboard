@@ -22,7 +22,7 @@
     <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 transition duration-300 ease-in-out z-50 w-64 bg-white border-r flex flex-col shadow-2xl lg:shadow-sm flex-shrink-0">
         <div class="h-16 flex items-center justify-between px-6 border-b border-gray-100">
             <span class="text-2xl font-bold text-red-700"><i class="fa-solid fa-gear"></i> RiSAO</span>
-            <button id="close-sidebar-btn" class="lg:hidden text-gray-400 hover:text-red-700 text-xl focus:outline-none">
+            <button id="close-sidebar-btn" class="lg:hidden text-gray-400 hover:text-red-700 text-xl focus:outline-none p-2">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -40,13 +40,19 @@
     </aside>
 
     <main class="flex-1 flex flex-col min-w-0 w-full">
-        <header class="h-16 bg-white shadow-sm flex items-center px-4 lg:px-6 z-0 flex-shrink-0 gap-3">
-            <button id="mobile-menu-btn" class="lg:hidden text-gray-500 hover:text-red-700 focus:outline-none p-1">
-                <i class="fa-solid fa-bars text-xl"></i>
-            </button>
+        
+        <header class="bg-white shadow-sm flex flex-col lg:flex-row lg:items-center lg:h-16 px-4 lg:px-6 py-3 lg:py-0 z-0 flex-shrink-0 gap-3">
+            
+            <div class="flex items-center gap-3 lg:hidden w-full">
+                <button id="mobile-menu-btn" class="text-gray-500 hover:text-red-700 focus:outline-none p-2">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+                <span class="text-2xl font-bold text-red-700"><i class="fa-solid fa-gear"></i> RiSAO</span>
+            </div>
+
             <div class="relative w-full lg:w-1/2 max-w-md">
                 <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="search-input" placeholder="ค้นหานักวิจัย, ภาควิชา, คำสำคัญ..." class="w-full bg-gray-100 rounded-full pl-11 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-shadow">
+                <input type="text" id="search-input" placeholder="ค้นหานักวิจัย, ภาควิชา, คำสำคัญ..." class="w-full bg-gray-100 rounded-full pl-11 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-shadow border border-gray-200 lg:border-none">
             </div>
         </header>
 
@@ -95,7 +101,7 @@
         <div id="view-publications" class="flex-1 p-4 lg:p-6 overflow-hidden hidden flex flex-col">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-6 flex flex-col h-full overflow-hidden">
                 <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
-                    <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมดของคณะวิศวกรรมศาสตร์ (2 ปีย้อนหลัง)</h3>
+                    <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมด (2 ปีย้อนหลัง)</h3>
                     <span class="text-[10px] lg:text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full self-start lg:self-auto">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span>
                 </div>
                 <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
@@ -135,7 +141,7 @@
         closeBtn.onclick = toggleSidebar;
         overlay.onclick = toggleSidebar;
 
-        // ปิดเมนูอัตโนมัติเวลาจิ้มเลือกเมนูบนมือถือ
+        // ปิดเมนูอัตโนมัติเวลาเลือกเมนูบนมือถือ
         document.querySelectorAll('#sidebar nav a').forEach(link => {
             link.addEventListener('click', () => {
                 if(window.innerWidth < 1024) toggleSidebar();
@@ -149,9 +155,7 @@
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
         const TABLE_NAME = 'นักวิจัย'; 
 
-        // 🔴 นำ SCOPUS API KEY มาใส่เรียบร้อยแล้ว
         const SCOPUS_API_KEY = '233469672124ca85d252ec13abe9ced5';
-
         let globalResearchersData = []; 
 
         function getAppSheetImageUrl(imagePath) {
@@ -194,7 +198,6 @@
                 listContainer.appendChild(div);
             });
 
-            // ไม่ต้องเลื่อนจอเวลาโหลดข้อมูลครั้งแรก
             if (dataToRender.length > 0) {
                 updateProfile(dataToRender[0], listContainer.firstChild, false);
             }
@@ -225,7 +228,7 @@
         }
 
         // ==========================================
-        // 3. ระบบแสดงผลโปรไฟล์และ Scopus (ส่วนบุคคล)
+        // 3. ระบบแสดงผลโปรไฟล์และ Scopus
         // ==========================================
         function updateProfile(person, clickedElement, isUserClick = false) {
             document.getElementById('prof-name-th').innerText = person['ชื่อ-สกุล'] || '-';
@@ -282,7 +285,7 @@
                 clickedElement.classList.remove('border-transparent');
                 clickedElement.classList.add('bg-red-50', 'border-red-600', 'shadow-sm');
                 
-                // เลื่อนหน้าจอลงมาที่โปรไฟล์อัตโนมัติ (เฉพาะบนมือถือ และเมื่อผู้ใช้เป็นคนกดเอง)
+                // เลื่อนจอไปที่โปรไฟล์อัตโนมัติบนมือถือ
                 if (isUserClick && window.innerWidth < 1024) {
                     document.getElementById('profile-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
@@ -349,7 +352,7 @@
         }
 
         // ==========================================
-        // 4. ระบบจัดการหน้า "ผลงานรวมคณะ (Publications)"
+        // 4. ระบบจัดการหน้า "ผลงานรวมคณะ"
         // ==========================================
         document.getElementById('menu-publications').onclick = (e) => {
             e.preventDefault();
@@ -506,14 +509,13 @@
                     }
                 }
                 updateProfile(prof, targetElement, true);
-                // บนหน้าจอใหญ่ให้เลื่อนกรอบรายชื่อ บนมือถือฟังก์ชัน updateProfile จัดการเลื่อนหน้าจอหลักให้แล้ว
                 if (targetElement && window.innerWidth >= 1024) {
                     targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             }
         }
 
-        // เริ่มโหลดข้อมูลครั้งแรก
+        // เริ่มโหลดข้อมูล
         loadData();
     </script>
 </body>
