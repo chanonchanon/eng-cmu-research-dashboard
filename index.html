@@ -15,7 +15,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden text-gray-800 relative">
+<body class="flex h-screen overflow-hidden text-gray-800 relative bg-gray-50">
 
     <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden transition-opacity"></div>
 
@@ -39,18 +39,20 @@
         </nav>
     </aside>
 
-    <main class="flex-1 flex flex-col min-w-0 w-full">
+    <main class="flex-1 flex flex-col min-w-0 w-full bg-gray-50">
         
         <header class="bg-white shadow-sm flex flex-col lg:flex-row lg:items-center lg:h-16 px-4 lg:px-6 py-3 lg:py-0 z-0 flex-shrink-0 gap-3">
             
-            <div class="flex items-center gap-3 lg:hidden w-full">
-                <button id="mobile-menu-btn" class="text-gray-500 hover:text-red-700 focus:outline-none p-2">
-                    <i class="fa-solid fa-bars text-2xl"></i>
-                </button>
-                <span class="text-2xl font-bold text-red-700"><i class="fa-solid fa-gear"></i> RiSAO</span>
+            <div class="flex items-center justify-between lg:hidden w-full">
+                <div class="flex items-center gap-3">
+                    <button id="mobile-menu-btn" class="text-gray-500 hover:text-red-700 focus:outline-none p-1">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                    <span class="text-2xl font-bold text-red-700"><i class="fa-solid fa-gear"></i> RiSAO</span>
+                </div>
             </div>
 
-            <div class="relative w-full lg:w-1/2 max-w-md">
+            <div class="relative w-full lg:w-1/2 max-w-md mt-1 lg:mt-0">
                 <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 <input type="text" id="search-input" placeholder="ค้นหานักวิจัย, ภาควิชา, คำสำคัญ..." class="w-full bg-gray-100 rounded-full pl-11 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-shadow border border-gray-200 lg:border-none">
             </div>
@@ -58,7 +60,7 @@
 
         <div id="view-researchers" class="flex-1 p-4 lg:p-6 flex flex-col lg:flex-row gap-4 lg:gap-6 overflow-y-auto lg:overflow-hidden">
             
-            <div class="w-full lg:w-1/4 lg:min-w-[250px] lg:max-w-[300px] h-[40vh] lg:h-auto bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-shrink-0">
+            <div class="w-full lg:w-1/4 lg:min-w-[250px] lg:max-w-[300px] h-[35vh] lg:h-auto bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-shrink-0">
                 <div class="p-3 lg:p-4 border-b border-gray-100 font-medium text-gray-700 text-sm lg:text-base">รายชื่อนักวิจัย</div>
                 <div class="flex-1 overflow-y-auto p-2" id="researcher-list">
                     <div class="text-center text-gray-400 text-sm mt-10"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังโหลดข้อมูล...</div>
@@ -155,6 +157,7 @@
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
         const TABLE_NAME = 'นักวิจัย'; 
 
+        // 🟢 SCOPUS API KEY ของคุณ 🟢
         const SCOPUS_API_KEY = '233469672124ca85d252ec13abe9ced5';
         let globalResearchersData = []; 
 
@@ -177,7 +180,7 @@
 
             dataToRender.forEach(person => {
                 const div = document.createElement('div');
-                div.className = "flex items-center p-2.5 lg:p-3 hover:bg-red-50 rounded-lg cursor-pointer border-l-4 border-transparent hover:border-red-600 mb-2 transition-all duration-200";
+                div.className = "flex items-center p-2.5 lg:p-3 hover:bg-red-50 rounded-lg cursor-pointer border-l-4 border-transparent hover:border-red-600 mb-2 transition-all duration-200 bg-white";
                 
                 const imgUrl = getAppSheetImageUrl(person['รูปภาพ']);
                 const imageHTML = imgUrl 
@@ -285,7 +288,6 @@
                 clickedElement.classList.remove('border-transparent');
                 clickedElement.classList.add('bg-red-50', 'border-red-600', 'shadow-sm');
                 
-                // เลื่อนจอไปที่โปรไฟล์อัตโนมัติบนมือถือ
                 if (isUserClick && window.innerWidth < 1024) {
                     document.getElementById('profile-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
