@@ -39,7 +39,7 @@
         </nav>
         
         <div class="p-4 border-t border-gray-100 text-[11px] text-gray-400 bg-gray-50/50 leading-relaxed">
-            * ใช้ JumboWifi หรือเครือข่ายของมหาวิทยาลัยเพื่อการแสดงผลที่ครบถ้วน
+            * ใช้ JumboWifi หรือเครือข่ายของมหาวิทยาลัยเพื่อการแสดงผลครบถ้วน
         </div>
     </aside>
 
@@ -127,9 +127,12 @@
 
         <div id="view-publications" class="flex-1 p-4 lg:p-6 overflow-hidden hidden flex flex-col">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-6 flex flex-col h-full overflow-hidden">
-                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
+                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
                     <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมด (2 ปีย้อนหลัง)</h3>
-                    <span class="text-[10px] lg:text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full self-start lg:self-auto">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span>
+                    <div class="flex flex-col items-start lg:items-end gap-1.5">
+                        <span class="text-[10px] lg:text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span>
+                        <span class="text-[10px] lg:text-[11px] text-gray-400 font-medium"></span>
+                    </div>
                 </div>
                 <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
                     <table class="w-full text-sm text-left border-collapse min-w-[600px] lg:min-w-full">
@@ -155,11 +158,6 @@
         const overlay = document.getElementById('sidebar-overlay');
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-        
-        const mobileHeaderDefault = document.getElementById('mobile-header-default');
-        const mobileHeaderSearch = document.getElementById('mobile-header-search');
-        const mobileSearchBtn = document.getElementById('mobile-search-btn');
-        const mobileSearchCloseBtn = document.getElementById('mobile-search-close-btn');
         const desktopSearchInput = document.getElementById('search-input-desktop');
         const mobileSearchInput = document.getElementById('search-input-mobile');
 
@@ -167,34 +165,12 @@
             sidebar.classList.toggle('-translate-x-full');
             overlay.classList.toggle('hidden');
         }
-
         mobileMenuBtn.onclick = toggleSidebar;
         closeSidebarBtn.onclick = toggleSidebar;
         overlay.onclick = toggleSidebar;
-
         document.querySelectorAll('#sidebar nav a').forEach(link => {
-            link.addEventListener('click', () => {
-                if(window.innerWidth < 1024) toggleSidebar();
-            });
+            link.addEventListener('click', () => { if(window.innerWidth < 1024) toggleSidebar(); });
         });
-
-        mobileSearchBtn.onclick = () => {
-            mobileHeaderDefault.classList.add('hidden');
-            mobileHeaderDefault.classList.remove('flex');
-            mobileHeaderSearch.classList.remove('hidden');
-            mobileHeaderSearch.classList.add('flex');
-            mobileSearchInput.focus();
-        };
-
-        mobileSearchCloseBtn.onclick = () => {
-            mobileHeaderSearch.classList.add('hidden');
-            mobileHeaderSearch.classList.remove('flex');
-            mobileHeaderDefault.classList.remove('hidden');
-            mobileHeaderDefault.classList.add('flex');
-            mobileSearchInput.value = '';
-            desktopSearchInput.value = '';
-            performSearch('');
-        };
 
         const API_URL = 'https://script.google.com/macros/s/AKfycbzMQCzrpCaXKUyRoZjBF0he-8OrAgKPtmK1zIEiTer-G4kGhDWrvR-3HrEech436VKu/exec';
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
@@ -203,6 +179,10 @@
         
         let globalResearchersData = []; 
         let currentActiveScopusId = null; 
+
+        // Caching System
+        const profileCache = {}; 
+        let cachedAllFacultyPubsHTML = null;
 
         function getAppSheetImageUrl(imagePath) {
             if (!imagePath || imagePath.trim() === '') return ''; 
@@ -217,7 +197,6 @@
         function renderResearcherList(dataToRender) {
             const listContainer = document.getElementById('researcher-list');
             listContainer.innerHTML = ''; 
-
             if (dataToRender.length === 0) {
                 listContainer.innerHTML = '<div class="text-center text-gray-400 text-sm mt-10">ไม่พบรายชื่อที่ค้นหา</div>';
                 return;
@@ -226,12 +205,8 @@
             dataToRender.forEach(person => {
                 const div = document.createElement('div');
                 div.className = "flex items-center p-2.5 lg:p-3 hover:bg-red-50 rounded-lg cursor-pointer border-l-4 border-transparent hover:border-red-600 mb-2 transition-all duration-200 bg-white";
-                
                 const imgUrl = getAppSheetImageUrl(person['รูปภาพ']);
-                const imageHTML = imgUrl 
-                    ? `<img src="${imgUrl}" alt="profile" class="w-full h-full object-cover">`
-                    : `<i class="fa-solid fa-user text-sm"></i>`;
-
+                const imageHTML = imgUrl ? `<img src="${imgUrl}" alt="profile" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user text-sm"></i>`;
                 div.innerHTML = `
                     <div class="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-gray-200 mr-3 overflow-hidden flex-shrink-0 flex items-center justify-center text-gray-400 shadow-sm border border-gray-100">
                         ${imageHTML}
@@ -241,12 +216,11 @@
                         <div class="text-[11px] lg:text-xs text-gray-500 truncate mt-0.5">${person['ภาควิชา'] || '-'}</div>
                     </div>
                 `;
-
                 div.onclick = () => updateProfile(person, div, true);
                 listContainer.appendChild(div);
             });
 
-            if (dataToRender.length > 0) {
+            if (dataToRender.length > 0 && !currentActiveScopusId) {
                 updateProfile(dataToRender[0], listContainer.firstChild, false);
             }
         }
@@ -266,15 +240,28 @@
         }
 
         desktopSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
-        mobileSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
+        if (mobileSearchInput) mobileSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
 
         async function loadData() {
+            const cachedData = sessionStorage.getItem('risao_researchers');
+            if (cachedData) {
+                globalResearchersData = JSON.parse(cachedData);
+                renderResearcherList(globalResearchersData);
+            }
+
             try {
                 const response = await fetch(API_URL);
-                globalResearchersData = await response.json(); 
-                renderResearcherList(globalResearchersData);
+                const data = await response.json();
+                sessionStorage.setItem('risao_researchers', JSON.stringify(data));
+                
+                if (!cachedData) {
+                    globalResearchersData = data;
+                    renderResearcherList(globalResearchersData);
+                } else {
+                    globalResearchersData = data; 
+                }
             } catch (error) {
-                document.getElementById('researcher-list').innerHTML = '<div class="text-red-500 text-sm p-4 text-center mt-5 bg-red-50 rounded-lg border border-red-100">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+                if (!cachedData) document.getElementById('researcher-list').innerHTML = '<div class="text-red-500 text-sm p-4 text-center mt-5 bg-red-50 rounded-lg border border-red-100">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
             }
         }
 
@@ -284,34 +271,22 @@
             
             const title = person['ตำแหน่งทางวิชาการ'] || '';
             const status = person['สถานะ'] || '';
-            
             let statusHtml = '';
             if (status) {
-                if (status.trim() === 'ทำงานปกติ') {
-                    statusHtml = `<span class="text-emerald-600 font-medium">${status}</span>`;
-                } else {
-                    statusHtml = `<span class="text-red-600 font-medium">${status}</span>`;
-                }
+                statusHtml = status.trim() === 'ทำงานปกติ' ? `<span class="text-emerald-600 font-medium">${status}</span>` : `<span class="text-red-600 font-medium">${status}</span>`;
             }
-            
-            if (title && statusHtml) {
-                document.getElementById('prof-title').innerHTML = `${title} <span class="mx-1 text-gray-300">•</span> ${statusHtml}`;
-            } else {
-                document.getElementById('prof-title').innerHTML = title || statusHtml || '-';
-            }
+            document.getElementById('prof-title').innerHTML = (title && statusHtml) ? `${title} <span class="mx-1 text-gray-300">•</span> ${statusHtml}` : (title || statusHtml || '-');
             
             document.getElementById('prof-dept').innerText = person['ภาควิชา'] || '-';
             document.getElementById('prof-phone').innerText = person['เบอร์ติดต่อ'] || '-';
             document.getElementById('prof-email').innerText = person['E-Mail'] || '-';
             
-            const rawId = person['ScopusAuthorID'];
-            const scopusId = cleanScopusId(rawId);
-            
+            const scopusId = cleanScopusId(person['ScopusAuthorID']);
             currentActiveScopusId = scopusId;
 
             const scopusContainer = document.getElementById('prof-scopus');
             if (scopusId && scopusId !== '-' && scopusId !== 'ไม่มีข้อมูล') {
-                scopusContainer.innerHTML = `<a href="https://www.scopus.com/authid/detail.uri?authorId=${scopusId}" target="_blank" class="hover:underline hover:text-red-800 transition-colors inline-flex items-center gap-1" title="เปิดหน้าโปรไฟล์บน Scopus">${scopusId} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>`;
+                scopusContainer.innerHTML = `<a href="https://www.scopus.com/authid/detail.uri?authorId=${scopusId}" target="_blank" class="hover:underline hover:text-red-800 transition-colors inline-flex items-center gap-1">${scopusId} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>`;
             } else {
                 scopusContainer.innerText = 'ไม่มีข้อมูล';
             }
@@ -334,15 +309,19 @@
             if (clickedElement) {
                 clickedElement.classList.remove('border-transparent');
                 clickedElement.classList.add('bg-red-50', 'border-red-600', 'shadow-sm');
-                
                 if (isUserClick && window.innerWidth < 1024) {
                     document.getElementById('profile-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
 
-            // สั่งดึงข้อมูลทั้ง 2 ส่วน
-            fetchScopusMetrics(scopusId);
-            fetchScopusPublications(scopusId);
+            if (profileCache[scopusId] && profileCache[scopusId].metrics) {
+                document.getElementById('prof-metrics-grid').innerHTML = profileCache[scopusId].metrics;
+                document.getElementById('metrics-updated-date').innerText = profileCache[scopusId].date || '';
+                document.getElementById('pub-list').innerHTML = profileCache[scopusId].pubs || '';
+            } else {
+                fetchScopusMetrics(scopusId);
+                fetchScopusPublications(scopusId);
+            }
         }
 
         async function fetchScopusMetrics(scopusId) {
@@ -355,51 +334,29 @@
                 return;
             }
 
-            grid.innerHTML = `
-                <div class="col-span-2 xl:col-span-4 text-center py-6 text-blue-500 text-sm">
-                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลสถิติ...
-                </div>
-            `;
+            grid.innerHTML = `<div class="col-span-2 xl:col-span-4 text-center py-6 text-blue-500 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลสถิติ...</div>`;
 
             try {
-                let docCount = '-';
-                let citationCount = '-';
-                let hIndex = '-';
-                let coAuthorCount = '-';
+                let docCount = '-', citationCount = '-', hIndex = '-', coAuthorCount = '-';
 
                 const targetUrl = `https://api.elsevier.com/content/author/author_id/${scopusId}?view=metrics&apiKey=${SCOPUS_API_KEY}`;
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
                 
                 try {
                     const response = await fetch(proxyUrl);
                     if (response.ok) {
-                        const proxyData = await response.json();
-                        if (proxyData.contents) {
-                            const data = JSON.parse(proxyData.contents);
-                            if (data['service-error']) throw new Error("API Limit or Unauthorized");
-
-                            const authorArray = data['author-retrieval-response'];
-                            const authorData = Array.isArray(authorArray) ? authorArray[0] : authorArray;
-
-                            docCount = authorData?.coredata?.['document-count'] ?? '-';
-                            citationCount = authorData?.coredata?.['citation-count'] ?? authorData?.coredata?.['cited-by-count'] ?? '-';
-                            hIndex = authorData?.['h-index'] ?? '-';
-                            coAuthorCount = authorData?.['coauthor-count'] ?? '-';
-                        } else {
-                            throw new Error("ไม่มีข้อมูลจาก Proxy");
-                        }
-                    } else {
-                        throw new Error("Proxy ติดต่อไม่ได้");
-                    }
+                        const data = await response.json();
+                        if (data['service-error']) throw new Error("API Limit");
+                        const authorArray = data['author-retrieval-response'];
+                        const authorData = Array.isArray(authorArray) ? authorArray[0] : authorArray;
+                        docCount = authorData?.coredata?.['document-count'] ?? '-';
+                        citationCount = authorData?.coredata?.['citation-count'] ?? authorData?.coredata?.['cited-by-count'] ?? '-';
+                        hIndex = authorData?.['h-index'] ?? '-';
+                        coAuthorCount = authorData?.['coauthor-count'] ?? '-';
+                    } else throw new Error("Proxy failed");
                 } catch (err) {
                     const searchUrl = `https://api.elsevier.com/content/search/scopus?query=AU-ID(${scopusId})&count=1`;
-                    const searchRes = await fetch(searchUrl, { 
-                        headers: { 
-                            'X-ELS-APIKey': SCOPUS_API_KEY, 
-                            'Accept': 'application/json' 
-                        } 
-                    });
-                    
+                    const searchRes = await fetch(searchUrl, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' } });
                     if (searchRes.ok) {
                         const searchData = await searchRes.json();
                         docCount = searchData['search-results']?.['opensearch:totalResults'] || '-';
@@ -408,40 +365,41 @@
 
                 if (currentActiveScopusId !== scopusId) return; 
 
-                const today = new Date();
-                const dateStr = today.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
-                dateLabel.innerText = `อัปเดตล่าสุด ${dateStr}`;
+                const dateStr = `อัปเดตล่าสุด ${new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                dateLabel.innerText = dateStr;
 
-                grid.innerHTML = `
+                const resultHTML = `
                     <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm">
                         <div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">ผลงานตีพิมพ์ทั้งหมด</div>
                         <div class="flex justify-between items-end">
-                            <span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${docCount}</span>
-                            <i class="fa-solid fa-book-open text-gray-300 text-lg"></i>
+                            <span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${docCount}</span><i class="fa-solid fa-book-open text-gray-300 text-lg"></i>
                         </div>
                     </div>
                     <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm">
                         <div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">Citations ทั้งหมด</div>
                         <div class="flex justify-between items-end">
-                            <span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${citationCount}</span>
-                            <i class="fa-solid fa-quote-right text-gray-300 text-lg"></i>
+                            <span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${citationCount}</span><i class="fa-solid fa-quote-right text-gray-300 text-lg"></i>
                         </div>
                     </div>
                     <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm">
                         <div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">h-index</div>
                         <div class="flex justify-between items-end">
-                            <span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${hIndex}</span>
-                            <i class="fa-solid fa-chart-line text-gray-300 text-lg"></i>
+                            <span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${hIndex}</span><i class="fa-solid fa-chart-line text-gray-300 text-lg"></i>
                         </div>
                     </div>
                     <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm">
                         <div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">ผลงานร่วมวิจัย</div>
                         <div class="flex justify-between items-end">
-                            <span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${coAuthorCount}</span>
-                            <i class="fa-solid fa-users text-gray-300 text-lg"></i>
+                            <span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${coAuthorCount}</span><i class="fa-solid fa-users text-gray-300 text-lg"></i>
                         </div>
                     </div>
                 `;
+                grid.innerHTML = resultHTML;
+
+                if (!profileCache[scopusId]) profileCache[scopusId] = {};
+                profileCache[scopusId].metrics = resultHTML;
+                profileCache[scopusId].date = dateStr;
+
             } catch(error) {
                 if (currentActiveScopusId !== scopusId) return;
                 grid.innerHTML = `<div class="col-span-2 xl:col-span-4 text-center py-4 text-red-400 text-xs bg-red-50 rounded-lg">เกิดข้อผิดพลาดการเชื่อมต่อ</div>`;
@@ -459,50 +417,61 @@
             const currentYear = new Date().getFullYear();
             const startYear = currentYear - 3; 
             const query = `AU-ID(${scopusId}) AND PUBYEAR > ${startYear - 1}`;
-            const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&sort=-coverDate`;
-
+            
             try {
-                const response = await fetch(url, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' } });
-                if (!response.ok) throw new Error();
-                const data = await response.json();
+                // อัปเดตใช้ Proxy ควบคู่ไปด้วย
+                let data = null;
+                const directUrl = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&sort=-coverDate&apiKey=${SCOPUS_API_KEY}`;
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
+
+                try {
+                    const response = await fetch(proxyUrl);
+                    if(response.ok) data = await response.json();
+                } catch(e) {}
+
+                if(!data) {
+                    const directResponse = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
+                    data = await directResponse.json();
+                }
                 
                 if (currentActiveScopusId !== scopusId) return;
-
                 const entries = data['search-results']['entry'];
-                pubList.innerHTML = ''; 
+                let resultHTML = '';
 
                 if (!entries || entries.length === 0) {
-                    pubList.innerHTML = `<tr><td class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-file-circle-xmark text-3xl mb-2 text-gray-300 block"></i>ไม่มีผลงานตีพิมพ์ในช่วงเวลาดังกล่าว<br><span class="text-xs mt-1 text-gray-400">(${startYear} - ${currentYear})</span></td></tr>`;
-                    return;
+                    resultHTML = `<tr><td class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-file-circle-xmark text-3xl mb-2 text-gray-300 block"></i>ไม่มีผลงานตีพิมพ์ในช่วงเวลาดังกล่าว</td></tr>`;
+                } else {
+                    entries.forEach(entry => {
+                        const title = entry['dc:title'] || 'ไม่มีชื่อเรื่อง';
+                        const authors = entry['dc:creator'] || 'ไม่ระบุชื่อผู้แต่ง';
+                        const pubName = entry['prism:publicationName'] || '';
+                        const year = entry['prism:coverDate'] ? entry['prism:coverDate'].substring(0, 4) : ''; 
+                        let link = '#';
+                        if (entry['link']) {
+                            const scopusLink = entry['link'].find(l => l['@ref'] === 'scopus');
+                            if (scopusLink) link = scopusLink['@href'];
+                        }
+                        resultHTML += `
+                            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                <td class="py-3 lg:py-4 pr-3 pl-2">
+                                    <div class="font-semibold text-gray-800 text-[12px] lg:text-[13px] mb-1">${title}</div>
+                                    <div class="text-[11px] lg:text-[12px] text-gray-500 mb-2">
+                                        <span class="font-medium text-gray-700">${authors}</span> <br>
+                                        <span class="italic">${pubName}</span> <span class="font-medium text-gray-600">(${year})</span>
+                                    </div>
+                                    <a href="${link}" target="_blank" class="inline-flex items-center gap-1 text-[10px] lg:text-[11px] text-blue-600 hover:text-blue-800 font-medium px-2 py-1 bg-blue-50 rounded hover:bg-blue-100 transition-colors">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i> ดูบน Scopus
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+                    });
                 }
+                pubList.innerHTML = resultHTML;
 
-                entries.forEach(entry => {
-                    const title = entry['dc:title'] || 'ไม่มีชื่อเรื่อง';
-                    const authors = entry['dc:creator'] || 'ไม่ระบุชื่อผู้แต่ง';
-                    const pubName = entry['prism:publicationName'] || '';
-                    const dateRaw = entry['prism:coverDate']; 
-                    const year = dateRaw ? dateRaw.substring(0, 4) : ''; 
-                    let link = '#';
-                    if (entry['link']) {
-                        const scopusLink = entry['link'].find(l => l['@ref'] === 'scopus');
-                        if (scopusLink) link = scopusLink['@href'];
-                    }
+                if (!profileCache[scopusId]) profileCache[scopusId] = {};
+                profileCache[scopusId].pubs = resultHTML;
 
-                    pubList.innerHTML += `
-                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                            <td class="py-3 lg:py-4 pr-3 pl-2">
-                                <div class="font-semibold text-gray-800 text-[12px] lg:text-[13px] mb-1">${title}</div>
-                                <div class="text-[11px] lg:text-[12px] text-gray-500 mb-2">
-                                    <span class="font-medium text-gray-700">${authors}</span> <br>
-                                    <span class="italic">${pubName}</span> <span class="font-medium text-gray-600">(${year})</span>
-                                </div>
-                                <a href="${link}" target="_blank" class="inline-flex items-center gap-1 text-[10px] lg:text-[11px] text-blue-600 hover:text-blue-800 font-medium px-2 py-1 bg-blue-50 rounded hover:bg-blue-100 transition-colors">
-                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> ดูบน Scopus
-                                </a>
-                            </td>
-                        </tr>
-                    `;
-                });
             } catch {
                 if (currentActiveScopusId !== scopusId) return;
                 pubList.innerHTML = `<tr><td class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-xs border border-red-100"><i class="fa-solid fa-triangle-exclamation mb-1 text-lg block"></i>เกิดข้อผิดพลาดในการเชื่อมต่อ Scopus</td></tr>`;
@@ -513,10 +482,8 @@
             e.preventDefault();
             document.getElementById('view-researchers').classList.add('hidden');
             document.getElementById('view-publications').classList.remove('hidden');
-            
             document.getElementById('menu-publications').className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
             document.getElementById('menu-researchers').className = "flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors";
-            
             loadAllFacultyPublications();
         };
 
@@ -524,17 +491,24 @@
             e.preventDefault();
             document.getElementById('view-researchers').classList.remove('hidden');
             document.getElementById('view-publications').classList.add('hidden');
-            
             document.getElementById('menu-researchers').className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
             document.getElementById('menu-publications').className = "flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors";
-            
-            desktopSearchInput.value = '';
-            mobileSearchInput.value = '';
-            performSearch('');
         };
 
         async function loadAllFacultyPublications() {
             const container = document.getElementById('all-faculty-pub-list');
+            
+            // 🚀 Check Session Storage Cache ก่อน เพื่อไม่ให้เสียเวลาโหลดใหม่
+            const sessionCache = sessionStorage.getItem('risao_all_pubs');
+            if (cachedAllFacultyPubsHTML) {
+                container.innerHTML = cachedAllFacultyPubsHTML;
+                return;
+            } else if (sessionCache) {
+                cachedAllFacultyPubsHTML = sessionCache;
+                container.innerHTML = sessionCache;
+                return;
+            }
+
             container.innerHTML = `<tr><td colspan="3" class="py-16 text-center text-blue-600 font-medium text-sm"><i class="fa-solid fa-circle-notch fa-spin mr-2 text-lg"></i>กำลังรวบรวมข้อมูลอย่างละเอียด กรุณารอสักครู่...</td></tr>`;
 
             const validProfs = globalResearchersData.filter(p => {
@@ -552,31 +526,39 @@
             let allEntries = [];
             
             try {
-                const batchSize = 10; 
+                const batchSize = 15; 
                 for (let i = 0; i < validProfs.length; i += batchSize) {
                     const batch = validProfs.slice(i, i + batchSize);
                     
                     const promises = batch.map(async (prof) => {
                         const scopusId = cleanScopusId(prof['ScopusAuthorID']);
                         const query = `AU-ID(${scopusId}) AND PUBYEAR > ${startYear - 1}`;
-                        const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&sort=-coverDate&count=50`;
                         
+                        let data = null;
+                        const directUrl = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&sort=-coverDate&count=30&apiKey=${SCOPUS_API_KEY}`;
+                        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
+
                         try {
-                            const response = await fetch(url, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' } });
-                            if (response.ok) {
-                                const resData = await response.json();
-                                const entries = resData['search-results']['entry'];
-                                if (entries && entries.length > 0) {
-                                    return entries.map(entry => ({ ...entry, matchedProf: prof }));
-                                }
-                            }
+                            const response = await fetch(proxyUrl);
+                            if(response.ok) data = await response.json();
                         } catch(e) {}
+
+                        if(!data) {
+                            try {
+                                const directResponse = await fetch(directUrl, { headers: { 'Accept': 'application/json' } });
+                                if(directResponse.ok) data = await directResponse.json();
+                            } catch(e) {}
+                        }
+
+                        if (data && data['search-results'] && data['search-results']['entry']) {
+                            const entries = data['search-results']['entry'];
+                            if (entries.length > 0) return entries.map(entry => ({ ...entry, matchedProf: prof }));
+                        }
                         return [];
                     });
                     
                     const batchResults = await Promise.all(promises);
                     allEntries = allEntries.concat(batchResults.flat());
-                    await new Promise(r => setTimeout(r, 200));
                 }
 
                 const uniqueMap = new Map();
@@ -596,51 +578,46 @@
                 });
 
                 const uniqueEntries = Array.from(uniqueMap.values());
+                uniqueEntries.sort((a, b) => (b['prism:coverDate'] || '').localeCompare(a['prism:coverDate'] || ''));
 
-                uniqueEntries.sort((a, b) => {
-                    const dateA = a['prism:coverDate'] || '';
-                    const dateB = b['prism:coverDate'] || '';
-                    return dateB.localeCompare(dateA);
-                });
-
-                container.innerHTML = ''; 
-
+                let resultHTML = '';
                 if (uniqueEntries.length === 0) {
-                    container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-file-circle-xmark text-3xl mb-2 text-gray-300 block"></i>ไม่มีผลงานตีพิมพ์ในช่วงเวลาดังกล่าว</td></tr>`;
-                    return;
+                    resultHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-file-circle-xmark text-3xl mb-2 text-gray-300 block"></i>ไม่มีผลงานตีพิมพ์ในช่วงเวลาดังกล่าว</td></tr>`;
+                } else {
+                    uniqueEntries.forEach(entry => {
+                        const title = entry['dc:title'] || 'ไม่มีชื่อเรื่อง';
+                        const year = entry['prism:coverDate'] ? entry['prism:coverDate'].substring(0, 4) : '';
+                        let researchersHTML = entry.facultyAuthors.map(prof => {
+                            let cleanId = cleanScopusId(prof['ScopusAuthorID']);
+                            return `<button onclick="switchToResearcher('${cleanId}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${prof['ชื่อ-สกุล']}</button>`;
+                        }).join('<span class="text-gray-300 mx-2 hidden lg:inline">|</span><br class="lg:hidden">');
+
+                        let scopusLink = '#';
+                        if (entry['link']) {
+                            const linkObj = entry['link'].find(l => l['@ref'] === 'scopus');
+                            if (linkObj) scopusLink = linkObj['@href'];
+                        }
+
+                        resultHTML += `
+                            <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
+                                <td class="py-3 lg:py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px]">${title} <span class="text-[10px] lg:text-xs text-gray-400 font-normal ml-1">(${year})</span></td>
+                                <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-sm">${researchersHTML}</td>
+                                <td class="py-3 lg:py-4 text-center">
+                                    <a href="${scopusLink}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="ดูบน Scopus">
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] lg:text-xs"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+                    });
                 }
-
-                uniqueEntries.forEach(entry => {
-                    const title = entry['dc:title'] || 'ไม่มีชื่อเรื่อง';
-                    const dateRaw = entry['prism:coverDate'];
-                    const year = dateRaw ? dateRaw.substring(0, 4) : '';
-
-                    let researchersHTML = entry.facultyAuthors.map(prof => {
-                        let cleanId = cleanScopusId(prof['ScopusAuthorID']);
-                        return `<button onclick="switchToResearcher('${cleanId}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${prof['ชื่อ-สกุล']}</button>`;
-                    }).join('<span class="text-gray-300 mx-2 hidden lg:inline">|</span><br class="lg:hidden">');
-
-                    let scopusLink = '#';
-                    if (entry['link']) {
-                        const linkObj = entry['link'].find(l => l['@ref'] === 'scopus');
-                        if (linkObj) scopusLink = linkObj['@href'];
-                    }
-
-                    container.innerHTML += `
-                        <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
-                            <td class="py-3 lg:py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px]">${title} <span class="text-[10px] lg:text-xs text-gray-400 font-normal ml-1">(${year})</span></td>
-                            <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-sm">${researchersHTML}</td>
-                            <td class="py-3 lg:py-4 text-center">
-                                <a href="${scopusLink}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="ดูบน Scopus">
-                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] lg:text-xs"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    `;
-                });
+                container.innerHTML = resultHTML;
+                
+                // 🚀 บันทึกลง Session Storage เพื่อให้การโหลดครั้งต่อไปเร็วแบบทันที
+                cachedAllFacultyPubsHTML = resultHTML;
+                sessionStorage.setItem('risao_all_pubs', resultHTML);
 
             } catch (error) {
-                console.error('Error:', error);
                 container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-sm">เกิดข้อผิดพลาดในการดึงข้อมูลจาก Scopus</td></tr>`;
             }
         }
@@ -648,14 +625,9 @@
         function switchToResearcher(scopusId) {
             document.getElementById('view-researchers').classList.remove('hidden');
             document.getElementById('view-publications').classList.add('hidden');
-            
             document.getElementById('menu-researchers').className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
             document.getElementById('menu-publications').className = "flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors";
             
-            desktopSearchInput.value = '';
-            mobileSearchInput.value = '';
-            performSearch('');
-
             let targetId = cleanScopusId(scopusId);
             const listContainer = document.getElementById('researcher-list');
             let prof = globalResearchersData.find(p => cleanScopusId(p['ScopusAuthorID']) === targetId);
