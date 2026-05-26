@@ -336,12 +336,11 @@
                 }
             }
 
-            // สั่งดึงข้อมูลทั้ง 2 ส่วน
             fetchScopusMetrics(scopusId);
             fetchScopusPublications(scopusId);
         }
 
-        // 🟢 ฟังก์ชันใหม่: ดึงข้อมูลสรุปผลงานวิจัย (Metrics) 🟢
+        // 🟢 อัปเดต: ฟังก์ชันดึงสถิติวิจัย (มีระบบเช็ค Error แจ้งเตือนแบบละเอียด) 🟢
         async function fetchScopusMetrics(scopusId) {
             const grid = document.getElementById('prof-metrics-grid');
             const dateLabel = document.getElementById('metrics-updated-date');
@@ -359,25 +358,28 @@
             `;
 
             try {
-                // เรียกใช้ Author Retrieval API เพื่อดึงตัวเลขสถิติ
                 const url = `https://api.elsevier.com/content/author/author_id/${scopusId}?view=metrics`;
                 const response = await fetch(url, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' } });
                 
                 if (currentActiveScopusId !== scopusId) return; 
 
-                if (!response.ok) throw new Error();
+                if (!response.ok) {
+                    if (response.status === 429) throw new Error('429_LIMIT');
+                    if (response.status === 404) throw new Error('404_NOT_FOUND');
+                    throw new Error(`HTTP_${response.status}`);
+                }
                 const data = await response.json();
                 
-                // ตรวจสอบและดึงข้อมูลออกมา
                 const authorArray = data['author-retrieval-response'];
                 const authorData = Array.isArray(authorArray) ? authorArray[0] : authorArray;
 
+                if (!authorData) throw new Error('NO_DATA');
+
                 const docCount = authorData?.coredata?.['document-count'] || '0';
-                const citationCount = authorData?.coredata?.['citation-count'] || '0';
+                const citationCount = authorData?.coredata?.['citation-count'] || authorData?.coredata?.['cited-by-count'] || '0';
                 const hIndex = authorData?.['h-index'] || '0';
                 const coAuthorCount = authorData?.['coauthor-count'] || '0';
 
-                // จัดการรูปแบบวันที่
                 const today = new Date();
                 const dateStr = today.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
                 dateLabel.innerText = `อัปเดตล่าสุด ${dateStr}`;
@@ -414,7 +416,13 @@
                 `;
             } catch(error) {
                 if (currentActiveScopusId !== scopusId) return;
-                grid.innerHTML = `<div class="col-span-2 xl:col-span-4 text-center py-4 text-red-400 text-xs bg-red-50 rounded-lg">ไม่สามารถดึงข้อมูลสถิติจาก Scopus ได้</div>`;
+                
+                let errorMsg = "ไม่สามารถดึงข้อมูลสถิติได้";
+                if (error.message === '429_LIMIT') errorMsg = "ดึงข้อมูลถี่เกินไป (ติด Limit) กรุณารอสักครู่";
+                else if (error.message === '404_NOT_FOUND') errorMsg = "ไม่พบข้อมูลสถิติของ ID นี้";
+                
+                grid.innerHTML = `<div class="col-span-2 xl:col-span-4 text-center py-4 text-red-400 text-[11px] lg:text-xs bg-red-50 rounded-lg border border-red-100">${errorMsg}</div>`;
+                dateLabel.innerText = '';
             }
         }
 
@@ -480,7 +488,7 @@
         }
 
         // ==========================================
-        // 4. ระบบจัดการหน้า "ผลงานรวมคณะ" (ดึงแบบแม่นยำ 100%)
+        // 4. ระบบจัดการหน้า "ผลงานรวมคณะ"
         // ==========================================
         document.getElementById('menu-publications').onclick = (e) => {
             e.preventDefault();
