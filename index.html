@@ -144,39 +144,20 @@
                     <p class="text-sm text-gray-500 mt-1">มหาวิทยาลัยเชียงใหม่ <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs ml-2">Powered by SciVal</span></p>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-6" id="dashboard-metrics">
-                <div class="col-span-1 md:col-span-3 text-center py-10 text-gray-400 bg-white rounded-xl shadow-sm border border-gray-100">
-                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลจาก SciVal...
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex-1">
-                <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">ระบบสรุปสถิติผลงานตีพิมพ์ 5 ปีย้อนหลัง</h3>
-                <div class="text-sm text-gray-500 leading-relaxed">
-                    ระบบทำการดึงข้อมูลภาพรวมการวิจัยจากฐานข้อมูล <strong>SciVal API</strong> โดยอัตโนมัติ ซึ่งประกอบไปด้วย จำนวนผลงานตีพิมพ์รวม (Scholarly Output), ยอดการอ้างอิง (Citation Count), และดัชนีชี้วัดคุณภาพผลงาน (FWCI)
-                </div>
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-6" id="dashboard-metrics"><div class="col-span-1 md:col-span-3 text-center py-10 text-gray-400 bg-white rounded-xl shadow-sm border border-gray-100"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลจาก SciVal...</div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex-1"><h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">ระบบสรุปสถิติผลงานตีพิมพ์ 5 ปีย้อนหลัง</h3><div class="text-sm text-gray-500 leading-relaxed">ระบบทำการดึงข้อมูลภาพรวมการวิจัยจากฐานข้อมูล <strong>SciVal API</strong> โดยอัตโนมัติ ซึ่งประกอบไปด้วย จำนวนผลงานตีพิมพ์รวม (Scholarly Output), ยอดการอ้างอิง (Citation Count), และดัชนีชี้วัดคุณภาพผลงาน (FWCI)</div></div>
         </div>
 
         <div id="view-publications" class="absolute inset-0 p-4 lg:p-6 hidden flex-col overflow-hidden">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-6 flex flex-col h-full overflow-hidden">
                 <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
                     <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมด (2 ปีย้อนหลัง)</h3>
-                    <div class="flex flex-col items-start lg:items-end gap-1.5">
-                        <span class="text-[10px] lg:text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span>
-                    </div>
+                    <div class="flex flex-col items-start lg:items-end gap-1.5"><span class="text-[10px] lg:text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span></div>
                 </div>
                 <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
                     <table class="w-full text-sm text-left border-collapse min-w-[600px] lg:min-w-full">
-                        <thead class="sticky top-0 bg-white z-10 shadow-sm shadow-gray-50">
-                            <tr class="text-gray-400 border-b border-gray-100 text-xs lg:text-sm">
-                                <th class="pb-3 font-medium pl-2 w-3/5">ชื่องานตีพิมพ์ (TITLE)</th>
-                                <th class="pb-3 font-medium w-1/4">นักวิจัยในคณะ</th>
-                                <th class="pb-3 font-medium w-20 text-center">ลิงก์</th>
-                            </tr>
-                        </thead>
-                        <tbody id="all-faculty-pub-list">
-                            <tr><td colspan="3" class="py-10 text-center text-gray-400">กำลังรอการโหลดข้อมูล...</td></tr>
-                        </tbody>
+                        <thead class="sticky top-0 bg-white z-10 shadow-sm shadow-gray-50"><tr class="text-gray-400 border-b border-gray-100 text-xs lg:text-sm"><th class="pb-3 font-medium pl-2 w-3/5">ชื่องานตีพิมพ์ (TITLE)</th><th class="pb-3 font-medium w-1/4">นักวิจัยในคณะ</th><th class="pb-3 font-medium w-20 text-center">ลิงก์</th></tr></thead>
+                        <tbody id="all-faculty-pub-list"><tr><td colspan="3" class="py-10 text-center text-gray-400">กำลังรอการโหลดข้อมูล...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -187,15 +168,9 @@
                 <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
                     <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-lightbulb text-red-700 mr-2"></i>ผลงานนวัตกรรมทั้งหมด (All Innovations)</h3>
                 </div>
-                <div class="flex-1 flex items-center justify-center text-gray-400">
-                    <div class="text-center">
-                        <i class="fa-solid fa-person-digging text-4xl mb-3 text-gray-300"></i>
-                        <p>หน้าแสดงผลงานนวัตกรรมรวม (รอนำเข้าข้อมูล)</p>
-                    </div>
-                </div>
+                <div class="flex-1 flex items-center justify-center text-gray-400"><div class="text-center"><i class="fa-solid fa-person-digging text-4xl mb-3 text-gray-300"></i><p>หน้าแสดงผลงานนวัตกรรมรวม (รอนำเข้าข้อมูล)</p></div></div>
             </div>
         </div>
-
     </main>
 
     <script>
@@ -290,26 +265,23 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbzMQCzrpCaXKUyRoZjBF0he-8OrAgKPtmK1zIEiTer-G4kGhDWrvR-3HrEech436VKu/exec';
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
         const TABLE_NAME = 'นักวิจัย'; 
-        const SCOPUS_API_KEY = 'd78eadd9ef0c622d8ef3a1c7e6f4cbb9';
+        const SCOPUS_API_KEY = '233469672124ca85d252ec13abe9ced5';
         const SCIVAL_API_KEY = SCOPUS_API_KEY; 
         const SCIVAL_ENTITY_ID = 'Institution/505638'; 
         
         let globalResearchersData = []; 
         let currentActiveScopusId = null; 
         let globalAllPublicationsData = []; 
-        const profileCache = {}; 
-        let cachedAllFacultyPubsHTML = null;
-
+        
         function getAppSheetImageUrl(imagePath) {
             if (!imagePath || imagePath.trim() === '') return ''; 
             return `https://www.appsheet.com/template/gettablefileurl?appName=${APP_NAME}&tableName=${TABLE_NAME}&fileName=${encodeURIComponent(imagePath)}`;
         }
 
+        // 🌟 แก้ไข 1: กลับไปใช้ Logic ดั้งเดิมเพื่อไม่ให้เลข ID พัง
         function cleanScopusId(id) {
             if (!id) return '';
-            let idStr = String(id).trim();
-            if(idStr.includes(',')) idStr = idStr.split(',')[0].trim();
-            return idStr.replace(/[^0-9]/g, ''); 
+            return id.toString().replace(/,/g, '').trim();
         }
 
         function performSearch(searchTerm) {
@@ -358,33 +330,28 @@
                         <div class="text-[11px] lg:text-xs text-gray-500 truncate mt-0.5">${person['ภาควิชา'] || '-'}</div>
                     </div>
                 `;
-                div.onclick = () => { if (currentActiveView !== 'researchers') switchView('researchers'); updateProfile(person, div, true); };
+                div.onclick = () => { 
+                    if (currentActiveView !== 'researchers') switchView('researchers'); 
+                    updateProfile(person, div, true); 
+                };
                 listContainer.appendChild(div);
             });
-            if (dataToRender.length > 0 && !currentActiveScopusId && currentActiveView === 'researchers') {
+            
+            // สั่งโหลดคนแรกเสมอ
+            if (dataToRender.length > 0) {
                 updateProfile(dataToRender[0], listContainer.firstChild, false);
             }
         }
 
+        // 🌟 แก้ไข 2: ย้อนกลับไปโหลดข้อมูลตรงๆ ตามโค้ดเก่า เพื่อไม่ให้ Cache ทำข้อมูลหาย
         async function loadData() {
-            const cachedData = sessionStorage.getItem('risao_researchers');
-            if (cachedData) {
-                globalResearchersData = JSON.parse(cachedData);
-                renderResearcherList(globalResearchersData);
-            }
             try {
                 const response = await fetch(API_URL);
-                const data = await response.json();
-                sessionStorage.setItem('risao_researchers', JSON.stringify(data));
-                if (!cachedData) {
-                    globalResearchersData = data;
-                    renderResearcherList(globalResearchersData);
-                } else {
-                    globalResearchersData = data; 
-                }
+                globalResearchersData = await response.json();
+                renderResearcherList(globalResearchersData);
             } catch (error) {
                 const listContainer = document.getElementById('researcher-list');
-                if (!cachedData && listContainer) listContainer.innerHTML = '<div class="text-red-500 text-sm p-4 text-center mt-5 bg-red-50 rounded-lg border border-red-100">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+                if (listContainer) listContainer.innerHTML = '<div class="text-red-500 text-sm p-4 text-center mt-5 bg-red-50 rounded-lg border border-red-100">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
             }
         }
 
@@ -439,14 +406,8 @@
             const innoList = document.getElementById('innovation-list');
             if(innoList) innoList.innerHTML = `<i class="fa-solid fa-lightbulb text-3xl mb-3 text-gray-200"></i>รอเพิ่มข้อมูลนวัตกรรมของ ${person['ชื่อ-สกุล'] || ''}...`;
 
-            if (profileCache[scopusId] && profileCache[scopusId].metrics) {
-                document.getElementById('prof-metrics-grid').innerHTML = profileCache[scopusId].metrics;
-                document.getElementById('metrics-updated-date').innerText = profileCache[scopusId].date || '';
-                document.getElementById('pub-list').innerHTML = profileCache[scopusId].pubs || '';
-            } else {
-                fetchScopusMetrics(scopusId);
-                fetchScopusPublications(scopusId);
-            }
+            fetchScopusMetrics(scopusId);
+            fetchScopusPublications(scopusId);
         }
 
         async function fetchScopusMetrics(scopusId) {
@@ -493,28 +454,12 @@
                 dateLabel.innerText = dateStr;
 
                 const resultHTML = `
-                    <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm">
-                        <div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">ผลงานตีพิมพ์ทั้งหมด</div>
-                        <div class="flex justify-between items-end"><span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${docCount}</span><i class="fa-solid fa-book-open text-gray-300 text-lg"></i></div>
-                    </div>
-                    <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm">
-                        <div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">Citations ทั้งหมด</div>
-                        <div class="flex justify-between items-end"><span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${citationCount}</span><i class="fa-solid fa-quote-right text-gray-300 text-lg"></i></div>
-                    </div>
-                    <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm">
-                        <div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">h-index</div>
-                        <div class="flex justify-between items-end"><span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${hIndex}</span><i class="fa-solid fa-chart-line text-gray-300 text-lg"></i></div>
-                    </div>
-                    <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm">
-                        <div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">ผลงานร่วมวิจัย</div>
-                        <div class="flex justify-between items-end"><span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${coAuthorCount}</span><i class="fa-solid fa-users text-gray-300 text-lg"></i></div>
-                    </div>
+                    <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm"><div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">ผลงานตีพิมพ์ทั้งหมด</div><div class="flex justify-between items-end"><span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${docCount}</span><i class="fa-solid fa-book-open text-gray-300 text-lg"></i></div></div>
+                    <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm"><div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">Citations ทั้งหมด</div><div class="flex justify-between items-end"><span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${citationCount}</span><i class="fa-solid fa-quote-right text-gray-300 text-lg"></i></div></div>
+                    <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm"><div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">h-index</div><div class="flex justify-between items-end"><span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${hIndex}</span><i class="fa-solid fa-chart-line text-gray-300 text-lg"></i></div></div>
+                    <div class="bg-white border border-gray-100 rounded-lg p-3 flex flex-col justify-between shadow-sm"><div class="text-[11px] lg:text-xs text-gray-500 mb-2 font-medium">ผลงานร่วมวิจัย</div><div class="flex justify-between items-end"><span class="text-xl lg:text-2xl font-bold text-gray-800 leading-none">${coAuthorCount}</span><i class="fa-solid fa-users text-gray-300 text-lg"></i></div></div>
                 `;
                 grid.innerHTML = resultHTML;
-
-                if (!profileCache[scopusId]) profileCache[scopusId] = {};
-                profileCache[scopusId].metrics = resultHTML;
-                profileCache[scopusId].date = dateStr;
             } catch(error) {
                 if (currentActiveScopusId !== scopusId) return;
                 grid.innerHTML = `<div class="col-span-2 xl:col-span-4 text-center py-4 text-red-400 text-xs bg-red-50 rounded-lg">เกิดข้อผิดพลาดการเชื่อมต่อ</div>`;
@@ -571,62 +516,9 @@
                     });
                 }
                 pubList.innerHTML = resultHTML;
-                if (!profileCache[scopusId]) profileCache[scopusId] = {};
-                profileCache[scopusId].pubs = resultHTML;
-
             } catch {
                 if (currentActiveScopusId !== scopusId) return;
                 pubList.innerHTML = `<tr><td class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-xs border border-red-100"><i class="fa-solid fa-triangle-exclamation mb-1 text-lg block"></i>เกิดข้อผิดพลาดในการเชื่อมต่อ Scopus</td></tr>`;
-            }
-        }
-
-        async function loadDashboard() {
-            const metricsContainer = document.getElementById('dashboard-metrics');
-            if(!metricsContainer) return;
-            const cachedData = sessionStorage.getItem('risao_scival_dashboard');
-            if(cachedData) { metricsContainer.innerHTML = cachedData; return; }
-
-            metricsContainer.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10 text-blue-500 bg-white rounded-xl shadow-sm border border-gray-100"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลอัปเดตจาก SciVal API...</div>`;
-
-            try {
-                const url = `https://api.elsevier.com/analytics/scival/institution/metrics?institutionIds=${SCIVAL_ENTITY_ID}&metricTypes=ScholarlyOutput,CitationCount,FieldWeightedCitationImpact&yearRange=5yrs&apiKey=${SCIVAL_API_KEY}`;
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-                const res = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' }});
-                if(!res.ok) throw new Error("SciVal API Error");
-                
-                const data = await res.json();
-                if (!data.results || data.results.length === 0) throw new Error("No Data");
-
-                const results = data.results[0].metrics;
-                const so = results.ScholarlyOutput?.value || 'N/A';
-                const cc = results.CitationCount?.value || 'N/A';
-                const fwci = results.FieldWeightedCitationImpact?.value || 'N/A';
-                const fwciDisplay = !isNaN(fwci) ? parseFloat(fwci).toFixed(2) : fwci;
-
-                const html = `
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">ผลงานตีพิมพ์รวม (5 ปี)</div>
-                        <div class="flex justify-between items-end"><span class="text-4xl font-extrabold text-blue-600">${so}</span><i class="fa-solid fa-file-lines text-blue-100 text-4xl"></i></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">การอ้างอิงรวม (Citations)</div>
-                        <div class="flex justify-between items-end"><span class="text-4xl font-extrabold text-green-600">${cc}</span><i class="fa-solid fa-quote-right text-green-100 text-4xl"></i></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-purple-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">FWCI (คุณภาพเทียบระดับโลก)</div>
-                        <div class="flex justify-between items-end"><span class="text-4xl font-extrabold text-purple-600">${fwciDisplay}</span><i class="fa-solid fa-globe text-purple-100 text-4xl"></i></div>
-                    </div>
-                `;
-                metricsContainer.innerHTML = html;
-                sessionStorage.setItem('risao_scival_dashboard', html);
-            } catch (error) {
-                metricsContainer.innerHTML = `
-                    <div class="col-span-1 md:col-span-3 flex flex-col items-center justify-center py-10 text-red-500 bg-red-50 rounded-xl border border-red-100">
-                        <i class="fa-solid fa-lock mb-3 text-3xl opacity-50"></i>
-                        <div class="font-bold mb-1">ไม่สามารถเข้าถึงฐานข้อมูล SciVal ได้</div>
-                        <div class="text-xs text-gray-500 max-w-md text-center">ระบบตรวจพบว่า API Key ของท่านยังไม่ได้รับสิทธิ์ในการดึงข้อมูลจาก SciVal</div>
-                    </div>
-                `;
             }
         }
 
@@ -635,8 +527,6 @@
             if(!container) return;
 
             if (globalAllPublicationsData.length > 0) { renderPublications(globalAllPublicationsData); return; }
-            const sessionData = sessionStorage.getItem('risao_all_pubs_data');
-            if (sessionData) { try { globalAllPublicationsData = JSON.parse(sessionData); renderPublications(globalAllPublicationsData); return; } catch(e) {} }
 
             container.innerHTML = `<tr><td colspan="3" class="py-16 text-center text-blue-600 font-medium text-sm"><i class="fa-solid fa-circle-notch fa-spin mr-2 text-lg"></i>กำลังรวบรวมข้อมูลผลงานทั้งหมด กรุณารอสักครู่...</td></tr>`;
 
@@ -666,7 +556,6 @@
                         }
                         return [];
                     });
-                    
                     const batchResults = await Promise.all(promises);
                     allEntries = allEntries.concat(batchResults.flat());
                 }
@@ -689,13 +578,10 @@
                 globalAllPublicationsData = Array.from(uniqueMap.values());
                 globalAllPublicationsData.sort((a, b) => (b['prism:coverDate'] || '').localeCompare(a['prism:coverDate'] || ''));
 
-                try { sessionStorage.setItem('risao_all_pubs_data', JSON.stringify(globalAllPublicationsData)); } catch(e) { }
                 renderPublications(globalAllPublicationsData);
 
             } catch (error) {
-                if(globalAllPublicationsData.length === 0) {
-                    container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-sm">เกิดข้อผิดพลาดในการดึงข้อมูลจาก Scopus</td></tr>`;
-                }
+                if(globalAllPublicationsData.length === 0) container.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-sm">เกิดข้อผิดพลาดในการดึงข้อมูลจาก Scopus</td></tr>`;
             }
         }
 
@@ -722,21 +608,17 @@
                         <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
                             <td class="py-3 lg:py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px]">${title} <span class="text-[10px] lg:text-xs text-gray-400 font-normal ml-1">(${year})</span></td>
                             <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-sm leading-relaxed">${researchersHTML}</td>
-                            <td class="py-3 lg:py-4 text-center">
-                                <a href="${scopusLink}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="ดูบน Scopus"><i class="fa-solid fa-arrow-up-right-from-square text-[10px] lg:text-xs"></i></a>
-                            </td>
+                            <td class="py-3 lg:py-4 text-center"><a href="${scopusLink}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="ดูบน Scopus"><i class="fa-solid fa-arrow-up-right-from-square text-[10px] lg:text-xs"></i></a></td>
                         </tr>
                     `;
                 });
             }
             container.innerHTML = resultHTML;
-            if(dataArray.length === globalAllPublicationsData.length && globalAllPublicationsData.length > 0) cachedAllFacultyPubsHTML = resultHTML;
         }
 
         function filterPublications(searchTerm) {
             if (globalAllPublicationsData.length === 0) return;
             if (searchTerm === '') { renderPublications(globalAllPublicationsData); return; }
-
             const filteredPubs = globalAllPublicationsData.filter(entry => {
                 const title = (entry['dc:title'] || '').toLowerCase();
                 const year = (entry['prism:coverDate'] || '').substring(0, 4);
@@ -761,7 +643,7 @@
             }
         }
 
-        // Initialize App
+        // Initial Run
         loadData();
     </script>
 </body>
