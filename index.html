@@ -15,63 +15,69 @@
         ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
     </style>
 </head>
-<body class="flex h-[100dvh] overflow-hidden text-gray-800 relative bg-gray-50">
+<body class="fixed inset-0 flex flex-col text-gray-800 bg-gray-50 overflow-hidden">
 
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden transition-opacity"></div>
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-4 lg:px-6 flex-shrink-0 w-full z-30 relative">
+        <div class="flex items-center gap-3 lg:gap-4">
+            <button id="hamburger-btn" class="text-gray-600 hover:text-red-700 focus:outline-none p-2 text-xl transition-colors">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <a href="#" id="logo-home" class="text-xl lg:text-2xl font-bold text-red-700 flex items-center gap-2 hover:scale-105 transition-transform" title="กลับหน้าแรก">
+                <i class="fa-solid fa-gear"></i> RiSAO
+            </a>
+        </div>
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 transition duration-300 ease-in-out z-50 w-64 bg-white border-r flex flex-col shadow-2xl lg:shadow-sm flex-shrink-0">
-        <div class="h-16 flex items-center justify-between px-6 border-b border-gray-100">
-            <span class="text-2xl font-bold text-red-700"><i class="fa-solid fa-gear"></i> RiSAO</span>
-            <button id="close-sidebar-btn" class="lg:hidden text-gray-400 hover:text-red-700 text-2xl focus:outline-none p-2">
+        <div class="flex items-center">
+            <div class="hidden md:block relative w-64 lg:w-80">
+                <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="search-input-desktop" placeholder="ค้นหานักวิจัย, ภาควิชา, คำสำคัญ..." class="w-full bg-gray-100 rounded-full pl-11 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-shadow">
+            </div>
+            <button id="mobile-search-btn" class="md:hidden text-gray-600 hover:text-red-700 focus:outline-none p-2 rounded-full hover:bg-red-50 transition-colors">
+                <i class="fa-solid fa-search text-xl"></i>
+            </button>
+        </div>
+
+        <div id="mobile-header-search" class="hidden absolute inset-0 bg-white z-40 items-center px-4 gap-2">
+            <div class="relative w-full">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="search-input-mobile" placeholder="ค้นหานักวิจัย..." class="w-full bg-gray-100 border border-gray-300 rounded-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm">
+            </div>
+            <button id="mobile-search-close-btn" class="text-gray-500 hover:text-red-700 focus:outline-none p-2 rounded-full hover:bg-red-50">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity"></div>
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 w-64 bg-white border-r flex flex-col shadow-2xl">
+        <div class="h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-gray-50">
+            <span class="text-xl font-bold text-gray-700">เมนูหลัก</span>
+            <button id="close-sidebar-btn" class="text-gray-400 hover:text-red-700 text-2xl focus:outline-none p-1">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="#" id="menu-dashboard" class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
-                <i class="fa-solid fa-house w-6 text-center"></i> Dashboard
-            </a>
             <a href="#" id="menu-researchers" class="flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors">
                 <i class="fa-solid fa-users w-6 text-center"></i> Researchers
             </a>
             <a href="#" id="menu-publications" class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
                 <i class="fa-solid fa-book w-6 text-center"></i> Publications
             </a>
+            <a href="#" id="menu-innovation" class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                <i class="fa-solid fa-lightbulb w-6 text-center"></i> Innovation
+            </a>
+            <a href="#" id="menu-dashboard" class="flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                <i class="fa-solid fa-chart-line w-6 text-center"></i> Dashboard
+            </a>
         </nav>
-        
         <div class="p-4 border-t border-gray-100 text-[11px] text-gray-400 bg-gray-50/50 leading-relaxed">
             * ใช้ JumboWifi หรือเครือข่ายของมหาวิทยาลัยเพื่อการแสดงผลครบถ้วน
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col min-w-0 w-full bg-gray-50 overflow-hidden">
+    <main class="flex-1 relative w-full h-full overflow-hidden">
         
-        <header class="bg-white shadow-sm flex items-center h-16 px-4 lg:px-6 flex-shrink-0 sticky top-0 z-30">
-            <div class="hidden lg:flex relative w-1/2 max-w-md">
-                <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="search-input-desktop" placeholder="ค้นหานักวิจัย, ภาควิชา, คำสำคัญ..." class="w-full bg-gray-100 rounded-full pl-11 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-shadow">
-            </div>
-
-            <div id="mobile-header-default" class="flex lg:hidden items-center justify-between w-full">
-                <button id="mobile-search-btn" class="text-gray-600 hover:text-red-700 focus:outline-none p-2 rounded-full hover:bg-red-50 transition-colors">
-                    <i class="fa-solid fa-search text-xl"></i>
-                </button>
-                <button id="mobile-menu-btn" class="flex items-center gap-2 text-2xl font-bold text-red-700 focus:outline-none p-2 active:scale-95 transition-transform">
-                    <i class="fa-solid fa-gear"></i> RiSAO
-                </button>
-            </div>
-
-            <div id="mobile-header-search" class="hidden lg:hidden items-center w-full gap-2">
-                <div class="relative w-full">
-                    <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="search-input-mobile" placeholder="ค้นหานักวิจัย..." class="w-full bg-gray-100 border border-gray-300 rounded-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm">
-                </div>
-                <button id="mobile-search-close-btn" class="text-gray-500 hover:text-red-700 focus:outline-none p-2 rounded-full hover:bg-red-50">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-        </header>
-
-        <div id="view-researchers" class="flex-1 p-4 lg:p-6 flex flex-col lg:flex-row gap-4 lg:gap-6 overflow-y-auto lg:overflow-hidden relative">
+        <div id="view-researchers" class="absolute inset-0 p-4 lg:p-6 flex flex-col lg:flex-row gap-4 lg:gap-6 overflow-y-auto">
             
             <div class="w-full lg:w-1/4 lg:min-w-[250px] lg:max-w-[300px] h-[35vh] lg:h-auto bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-shrink-0">
                 <div class="p-3 lg:p-4 border-b border-gray-100 font-medium text-gray-700 text-sm lg:text-base">รายชื่อนักวิจัย</div>
@@ -80,7 +86,7 @@
                 </div>
             </div>
 
-            <div id="profile-section" class="w-full lg:w-1/3 lg:min-w-[340px] lg:max-w-[480px] bg-white rounded-xl shadow-sm border border-gray-100 p-5 lg:p-6 flex flex-col items-center text-center lg:overflow-y-auto flex-shrink-0">
+            <div id="profile-section" class="w-full lg:w-1/3 lg:min-w-[320px] lg:max-w-[420px] bg-white rounded-xl shadow-sm border border-gray-100 p-5 lg:p-6 flex flex-col items-center text-center lg:overflow-y-auto flex-shrink-0 relative">
                 <div id="prof-image-container" class="w-24 h-24 lg:w-32 lg:h-32 rounded-full border-4 border-red-100 mb-3 lg:mb-4 overflow-hidden bg-gray-200 flex items-center justify-center text-gray-400 text-3xl lg:text-4xl shadow-sm">
                     <i class="fa-solid fa-user"></i>
                 </div>
@@ -111,27 +117,60 @@
                 </div>
             </div>
 
-            <div class="w-full lg:flex-1 lg:min-w-[350px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-5 flex flex-col lg:overflow-hidden min-h-[400px] lg:min-h-0">
+            <div class="w-full lg:flex-1 lg:min-w-[280px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-5 flex flex-col lg:overflow-hidden min-h-[300px] lg:min-h-0">
                 <div class="flex justify-between items-center mb-3 lg:mb-4 pb-2 border-b border-gray-100 flex-shrink-0">
                     <h3 class="font-medium text-gray-800 text-sm lg:text-base">ผลงานตีพิมพ์ 3 ปีล่าสุด</h3>
                 </div>
                 <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
-                    <table class="w-full text-sm text-left min-w-[300px]">
+                    <table class="w-full text-sm text-left min-w-[250px]">
                         <tbody id="pub-list">
                             <tr><td class="py-10 text-center text-gray-400">คลิกที่รายชื่อนักวิจัยเพื่อดูผลงาน</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <div class="w-full lg:flex-1 lg:min-w-[280px] bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-5 flex flex-col lg:overflow-hidden min-h-[300px] lg:min-h-0">
+                <div class="flex justify-between items-center mb-3 lg:mb-4 pb-2 border-b border-gray-100 flex-shrink-0">
+                    <h3 class="font-medium text-gray-800 text-sm lg:text-base">นวัตกรรม (Innovation)</h3>
+                </div>
+                <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
+                    <div id="innovation-list" class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10">
+                        <i class="fa-solid fa-lightbulb text-3xl mb-3 text-gray-200"></i>
+                        รอเพิ่มข้อมูลนวัตกรรม...
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="view-publications" class="flex-1 p-4 lg:p-6 overflow-hidden hidden flex flex-col relative">
+        <div id="view-dashboard" class="absolute inset-0 p-4 lg:p-6 hidden flex-col overflow-y-auto">
+            <div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-2">
+                <div>
+                    <h2 class="text-xl lg:text-2xl font-bold text-gray-800">ภาพรวมงานวิจัย (Research Dashboard)</h2>
+                    <p class="text-sm text-gray-500 mt-1">มหาวิทยาลัยเชียงใหม่ <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs ml-2">Powered by SciVal</span></p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-6" id="dashboard-metrics">
+                <div class="col-span-1 md:col-span-3 text-center py-10 text-gray-400 bg-white rounded-xl shadow-sm border border-gray-100">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลจาก SciVal...
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex-1">
+                <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">ระบบสรุปสถิติผลงานตีพิมพ์ 5 ปีย้อนหลัง</h3>
+                <div class="text-sm text-gray-500 leading-relaxed">
+                    ระบบทำการดึงข้อมูลภาพรวมการวิจัยจากฐานข้อมูล <strong>SciVal API</strong> โดยอัตโนมัติ ซึ่งประกอบไปด้วย จำนวนผลงานตีพิมพ์รวม (Scholarly Output), ยอดการอ้างอิง (Citation Count), และดัชนีชี้วัดคุณภาพผลงาน (FWCI)
+                </div>
+            </div>
+        </div>
+
+        <div id="view-publications" class="absolute inset-0 p-4 lg:p-6 hidden flex-col overflow-hidden">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-6 flex flex-col h-full overflow-hidden">
                 <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
                     <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมด (2 ปีย้อนหลัง)</h3>
                     <div class="flex flex-col items-start lg:items-end gap-1.5">
                         <span class="text-[10px] lg:text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span>
-                        <span class="text-[10px] lg:text-[11px] text-gray-400 font-medium">* ใช้ JumboWifi หรือเครือข่ายของมหาวิทยาลัยเพื่อการแสดงผลครบถ้วน</span>
                     </div>
                 </div>
                 <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
@@ -143,7 +182,7 @@
                                 <th class="pb-3 font-medium w-20 text-center">ลิงก์</th>
                             </tr>
                         </thead>
-                        <tbody id="all-faculty-pub-list" class="divide-y divide-gray-50">
+                        <tbody id="all-faculty-pub-list">
                             <tr><td colspan="3" class="py-10 text-center text-gray-400">กำลังรอการโหลดข้อมูล...</td></tr>
                         </tbody>
                     </table>
@@ -151,36 +190,119 @@
             </div>
         </div>
 
+        <div id="view-innovation-main" class="absolute inset-0 p-4 lg:p-6 hidden flex-col overflow-hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-6 flex flex-col h-full overflow-hidden">
+                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
+                    <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-lightbulb text-red-700 mr-2"></i>ผลงานนวัตกรรมทั้งหมด (All Innovations)</h3>
+                </div>
+                <div class="flex-1 flex items-center justify-center text-gray-400">
+                    <div class="text-center">
+                        <i class="fa-solid fa-person-digging text-4xl mb-3 text-gray-300"></i>
+                        <p>หน้าแสดงผลงานนวัตกรรมรวม (รอนำเข้าข้อมูล)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
+        // --- UI & Menu Navigation ---
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
         const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-        const desktopSearchInput = document.getElementById('search-input-desktop');
-        const mobileSearchInput = document.getElementById('search-input-mobile');
 
         function toggleSidebar() {
             sidebar.classList.toggle('-translate-x-full');
             overlay.classList.toggle('hidden');
         }
-        mobileMenuBtn.onclick = toggleSidebar;
+        hamburgerBtn.onclick = toggleSidebar;
         closeSidebarBtn.onclick = toggleSidebar;
         overlay.onclick = toggleSidebar;
-        document.querySelectorAll('#sidebar nav a').forEach(link => {
-            link.addEventListener('click', () => { if(window.innerWidth < 1024) toggleSidebar(); });
-        });
 
+        // 🌟 ตั้งค่าให้ปุ่ม Logo พากลับหน้า Researchers
+        document.getElementById('logo-home').onclick = (e) => {
+            e.preventDefault();
+            switchView('researchers');
+        };
+
+        const viewDashboard = document.getElementById('view-dashboard');
+        const viewResearchers = document.getElementById('view-researchers');
+        const viewPublications = document.getElementById('view-publications');
+        const viewInnovationMain = document.getElementById('view-innovation-main');
+
+        const menuDashboard = document.getElementById('menu-dashboard');
+        const menuResearchers = document.getElementById('menu-researchers');
+        const menuPublications = document.getElementById('menu-publications');
+        const menuInnovation = document.getElementById('menu-innovation');
+
+        function switchView(viewName) {
+            viewDashboard.classList.replace('flex', 'hidden');
+            viewResearchers.classList.replace('flex', 'hidden');
+            viewPublications.classList.replace('flex', 'hidden');
+            viewInnovationMain.classList.replace('flex', 'hidden');
+            
+            [menuDashboard, menuResearchers, menuPublications, menuInnovation].forEach(menu => {
+                menu.className = "flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors";
+            });
+
+            if (viewName === 'dashboard') {
+                viewDashboard.classList.replace('hidden', 'flex');
+                menuDashboard.className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
+                loadDashboard();
+            } else if (viewName === 'researchers') {
+                viewResearchers.classList.replace('hidden', 'flex');
+                menuResearchers.className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
+            } else if (viewName === 'publications') {
+                viewPublications.classList.replace('hidden', 'flex');
+                menuPublications.className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
+                loadAllFacultyPublications();
+            } else if (viewName === 'innovation') {
+                viewInnovationMain.classList.replace('hidden', 'flex');
+                menuInnovation.className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
+            }
+            
+            if (!sidebar.classList.contains('-translate-x-full')) {
+                toggleSidebar();
+            }
+        }
+
+        menuDashboard.onclick = (e) => { e.preventDefault(); switchView('dashboard'); };
+        menuResearchers.onclick = (e) => { e.preventDefault(); switchView('researchers'); };
+        menuPublications.onclick = (e) => { e.preventDefault(); switchView('publications'); };
+        menuInnovation.onclick = (e) => { e.preventDefault(); switchView('innovation'); };
+
+        // --- Search System ---
+        const mobileHeaderDefault = document.getElementById('mobile-header-default');
+        const mobileHeaderSearch = document.getElementById('mobile-header-search');
+        const mobileSearchInput = document.getElementById('search-input-mobile');
+        const desktopSearchInput = document.getElementById('search-input-desktop');
+
+        document.getElementById('mobile-search-btn').onclick = () => {
+            mobileHeaderSearch.classList.remove('hidden'); 
+            mobileHeaderSearch.classList.add('flex');
+            mobileSearchInput.focus();
+        };
+
+        document.getElementById('mobile-search-close-btn').onclick = () => {
+            mobileHeaderSearch.classList.add('hidden'); 
+            mobileHeaderSearch.classList.remove('flex');
+            mobileSearchInput.value = ''; 
+            desktopSearchInput.value = '';
+            performSearch('');
+        };
+
+        // --- Data & API ---
         const API_URL = 'https://script.google.com/macros/s/AKfycbzMQCzrpCaXKUyRoZjBF0he-8OrAgKPtmK1zIEiTer-G4kGhDWrvR-3HrEech436VKu/exec';
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
         const TABLE_NAME = 'นักวิจัย'; 
         const SCOPUS_API_KEY = '233469672124ca85d252ec13abe9ced5';
+        const SCIVAL_API_KEY = SCOPUS_API_KEY; 
+        const SCIVAL_ENTITY_ID = 'Institution/505638'; 
         
         let globalResearchersData = []; 
         let currentActiveScopusId = null; 
-
-        // Caching System
         const profileCache = {}; 
         let cachedAllFacultyPubsHTML = null;
 
@@ -192,6 +314,67 @@
         function cleanScopusId(id) {
             if (!id) return '';
             return id.toString().replace(/,/g, '').trim();
+        }
+
+        async function loadDashboard() {
+            const metricsContainer = document.getElementById('dashboard-metrics');
+            const cachedData = sessionStorage.getItem('risao_scival_dashboard');
+            if(cachedData) {
+                metricsContainer.innerHTML = cachedData;
+                return;
+            }
+
+            metricsContainer.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10 text-blue-500 bg-white rounded-xl shadow-sm border border-gray-100"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลอัปเดตจาก SciVal API...</div>`;
+
+            try {
+                const url = `https://api.elsevier.com/analytics/scival/institution/metrics?institutionIds=${SCIVAL_ENTITY_ID}&metricTypes=ScholarlyOutput,CitationCount,FieldWeightedCitationImpact&yearRange=5yrs&apiKey=${SCIVAL_API_KEY}`;
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                const res = await fetch(proxyUrl, { headers: { 'Accept': 'application/json' }});
+                if(!res.ok) throw new Error("SciVal API Error");
+                
+                const data = await res.json();
+                if (!data.results || data.results.length === 0) throw new Error("No Data");
+
+                const results = data.results[0].metrics;
+                const so = results.ScholarlyOutput?.value || 'N/A';
+                const cc = results.CitationCount?.value || 'N/A';
+                const fwci = results.FieldWeightedCitationImpact?.value || 'N/A';
+                const fwciDisplay = !isNaN(fwci) ? parseFloat(fwci).toFixed(2) : fwci;
+
+                const html = `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">ผลงานตีพิมพ์รวม (5 ปี)</div>
+                        <div class="flex justify-between items-end">
+                            <span class="text-4xl font-extrabold text-blue-600">${so}</span>
+                            <i class="fa-solid fa-file-lines text-blue-100 text-4xl"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">การอ้างอิงรวม (Citations)</div>
+                        <div class="flex justify-between items-end">
+                            <span class="text-4xl font-extrabold text-green-600">${cc}</span>
+                            <i class="fa-solid fa-quote-right text-green-100 text-4xl"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-purple-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">FWCI (คุณภาพเทียบระดับโลก)</div>
+                        <div class="flex justify-between items-end">
+                            <span class="text-4xl font-extrabold text-purple-600">${fwciDisplay}</span>
+                            <i class="fa-solid fa-globe text-purple-100 text-4xl"></i>
+                        </div>
+                    </div>
+                `;
+                metricsContainer.innerHTML = html;
+                sessionStorage.setItem('risao_scival_dashboard', html);
+            } catch (error) {
+                metricsContainer.innerHTML = `
+                    <div class="col-span-1 md:col-span-3 flex flex-col items-center justify-center py-10 text-red-500 bg-red-50 rounded-xl border border-red-100">
+                        <i class="fa-solid fa-lock mb-3 text-3xl opacity-50"></i>
+                        <div class="font-bold mb-1">ไม่สามารถเข้าถึงฐานข้อมูล SciVal ได้</div>
+                        <div class="text-xs text-gray-500 max-w-md text-center">ระบบตรวจพบว่า API Key ของท่านยังไม่ได้รับสิทธิ์ในการดึงข้อมูลจาก SciVal</div>
+                    </div>
+                `;
+            }
         }
 
         function renderResearcherList(dataToRender) {
@@ -216,7 +399,10 @@
                         <div class="text-[11px] lg:text-xs text-gray-500 truncate mt-0.5">${person['ภาควิชา'] || '-'}</div>
                     </div>
                 `;
-                div.onclick = () => updateProfile(person, div, true);
+                div.onclick = () => {
+                    switchView('researchers');
+                    updateProfile(person, div, true);
+                };
                 listContainer.appendChild(div);
             });
 
@@ -226,6 +412,7 @@
         }
 
         function performSearch(searchTerm) {
+            switchView('researchers');
             searchTerm = searchTerm.toLowerCase().trim();
             if (searchTerm === '') {
                 renderResearcherList(globalResearchersData);
@@ -240,7 +427,7 @@
         }
 
         desktopSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
-        if (mobileSearchInput) mobileSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
+        mobileSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
 
         async function loadData() {
             const cachedData = sessionStorage.getItem('risao_researchers');
@@ -253,7 +440,6 @@
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 sessionStorage.setItem('risao_researchers', JSON.stringify(data));
-                
                 if (!cachedData) {
                     globalResearchersData = data;
                     renderResearcherList(globalResearchersData);
@@ -306,20 +492,20 @@
                 item.classList.remove('bg-red-50', 'border-red-600', 'shadow-sm');
                 item.classList.add('border-transparent');
             }
+            
             if (clickedElement) {
                 clickedElement.classList.remove('border-transparent');
                 clickedElement.classList.add('bg-red-50', 'border-red-600', 'shadow-sm');
                 
-                // แก้ไข: ใช้ scrollTo แทน scrollIntoView เพื่อแก้ปัญหาแถบเมนูด้านบนหายในมือถือ
                 if (isUserClick && window.innerWidth < 1024) {
                     const viewContainer = document.getElementById('view-researchers');
                     const profileSection = document.getElementById('profile-section');
-                    viewContainer.scrollTo({
-                        top: profileSection.offsetTop - 16,
-                        behavior: 'smooth'
-                    });
+                    viewContainer.scrollTo({ top: profileSection.offsetTop - 16, behavior: 'smooth' });
                 }
             }
+
+            const innoList = document.getElementById('innovation-list');
+            innoList.innerHTML = `<i class="fa-solid fa-lightbulb text-3xl mb-3 text-gray-200"></i>รอเพิ่มข้อมูลนวัตกรรมของ ${person['ชื่อ-สกุล'] || ''}...`;
 
             if (profileCache[scopusId] && profileCache[scopusId].metrics) {
                 document.getElementById('prof-metrics-grid').innerHTML = profileCache[scopusId].metrics;
@@ -345,7 +531,6 @@
 
             try {
                 let docCount = '-', citationCount = '-', hIndex = '-', coAuthorCount = '-';
-
                 const targetUrl = `https://api.elsevier.com/content/author/author_id/${scopusId}?view=metrics&apiKey=${SCOPUS_API_KEY}`;
                 const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
                 
@@ -484,26 +669,8 @@
             }
         }
 
-        document.getElementById('menu-publications').onclick = (e) => {
-            e.preventDefault();
-            document.getElementById('view-researchers').classList.add('hidden');
-            document.getElementById('view-publications').classList.remove('hidden');
-            document.getElementById('menu-publications').className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
-            document.getElementById('menu-researchers').className = "flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors";
-            loadAllFacultyPublications();
-        };
-
-        document.getElementById('menu-researchers').onclick = (e) => {
-            e.preventDefault();
-            document.getElementById('view-researchers').classList.remove('hidden');
-            document.getElementById('view-publications').classList.add('hidden');
-            document.getElementById('menu-researchers').className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
-            document.getElementById('menu-publications').className = "flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors";
-        };
-
         async function loadAllFacultyPublications() {
             const container = document.getElementById('all-faculty-pub-list');
-            
             const sessionCache = sessionStorage.getItem('risao_all_pubs');
             if (cachedAllFacultyPubsHTML) {
                 container.innerHTML = cachedAllFacultyPubsHTML;
@@ -534,11 +701,9 @@
                 const batchSize = 15; 
                 for (let i = 0; i < validProfs.length; i += batchSize) {
                     const batch = validProfs.slice(i, i + batchSize);
-                    
                     const promises = batch.map(async (prof) => {
                         const scopusId = cleanScopusId(prof['ScopusAuthorID']);
                         const query = `AU-ID(${scopusId}) AND PUBYEAR > ${startYear - 1}`;
-                        
                         let data = null;
                         const directUrl = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&sort=-coverDate&count=30&apiKey=${SCOPUS_API_KEY}`;
                         const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
@@ -600,7 +765,7 @@
                         let scopusLink = '#';
                         if (entry['link']) {
                             const linkObj = entry['link'].find(l => l['@ref'] === 'scopus');
-                            if (linkObj) scopusLink = linkObj['@href'];
+                            if (scopusLink) link = scopusLink['@href'];
                         }
 
                         resultHTML += `
@@ -617,7 +782,6 @@
                     });
                 }
                 container.innerHTML = resultHTML;
-                
                 cachedAllFacultyPubsHTML = resultHTML;
                 sessionStorage.setItem('risao_all_pubs', resultHTML);
 
@@ -626,31 +790,8 @@
             }
         }
 
-        function switchToResearcher(scopusId) {
-            document.getElementById('view-researchers').classList.remove('hidden');
-            document.getElementById('view-publications').classList.add('hidden');
-            document.getElementById('menu-researchers').className = "flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium transition-colors";
-            document.getElementById('menu-publications').className = "flex items-center px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors";
-            
-            let targetId = cleanScopusId(scopusId);
-            const listContainer = document.getElementById('researcher-list');
-            let prof = globalResearchersData.find(p => cleanScopusId(p['ScopusAuthorID']) === targetId);
-            
-            if (prof) {
-                let targetElement = null;
-                for (let child of listContainer.children) {
-                    if (child.innerText.includes(prof['ชื่อ-สกุล'])) {
-                        targetElement = child;
-                        break;
-                    }
-                }
-                updateProfile(prof, targetElement, true);
-                if (targetElement && window.innerWidth >= 1024) {
-                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }
-        }
-
+        // Initialize
+        loadDashboard();
         loadData();
     </script>
 </body>
