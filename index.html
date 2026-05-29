@@ -148,7 +148,7 @@
             <div id="view-publications" class="absolute inset-0 p-4 lg:p-6 hidden flex-col overflow-hidden">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:p-6 flex flex-col h-full overflow-hidden">
                     <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
-                        <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมด (2 ปีย้อนหลัง)</h3>
+                        <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-book-open text-red-700 mr-2"></i>ผลงานตีพิมพ์ทั้งหมด (3 ปีย้อนหลัง)</h3>
                         <span class="text-[10px] lg:text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">อ้างอิงข้อมูลเรียลไทม์จาก Scopus</span>
                     </div>
                     <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
@@ -187,6 +187,7 @@
                     <div>
                         <h2 class="text-xl lg:text-2xl font-bold text-gray-800">ภาพรวมงานวิจัย (Research Dashboard)</h2>
                         <p class="text-sm text-gray-500 mt-1">คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่ <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs ml-2">Powered by Scopus</span></p>
+                        <p class="text-[11px] lg:text-xs text-gray-400 mt-1.5"><i class="fa-solid fa-info-circle mr-1"></i>ข้อมูลค้นหาจาก Scopus สังกัด 'Faculty of Engineering' และ 'Chiang Mai University'</p>
                     </div>
                 </div>
                 
@@ -198,14 +199,14 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 pb-6">
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
-                        <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2 text-[13px] lg:text-sm">สัดส่วนหัวข้อวิจัย (Research Areas)</h3>
+                        <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2 text-[13px] lg:text-sm">สัดส่วนหัวข้อวิจัย (Research Areas) <span class="text-gray-400 font-normal text-xs ml-1">(3 ปีย้อนหลัง)</span></h3>
                         <div class="flex-1 relative min-h-[280px] flex items-center justify-center">
                             <canvas id="chart-area"></canvas>
                             <div id="chart-area-loading" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm bg-white"><i class="fa-solid fa-spinner fa-spin mr-2"></i>รอการประมวลผลข้อมูลผลงานตีพิมพ์...</div>
                         </div>
                     </div>
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
-                        <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2 text-[13px] lg:text-sm">ประเภทผลงาน (Document Types)</h3>
+                        <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2 text-[13px] lg:text-sm">ประเภทผลงาน (Document Types) <span class="text-gray-400 font-normal text-xs ml-1">(3 ปีย้อนหลัง)</span></h3>
                         <div class="flex-1 relative min-h-[280px] flex items-center justify-center">
                             <canvas id="chart-type"></canvas>
                             <div id="chart-type-loading" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm bg-white"><i class="fa-solid fa-spinner fa-spin mr-2"></i>รอการประมวลผลข้อมูลผลงานตีพิมพ์...</div>
@@ -218,7 +219,6 @@
     </div>
 
     <script>
-        // เปิดใช้งานปลั๊กอิน DataLabels ของ Chart.js ให้ทำงานได้
         Chart.register(ChartDataLabels);
 
         // ==========================================
@@ -267,14 +267,14 @@
             if (viewName === 'dashboard') {
                 desktopInput.placeholder = "ไม่สามารถค้นหาในหน้านี้ได้"; desktopInput.disabled = true;
                 mobileInput.placeholder = "ไม่สามารถค้นหาในหน้านี้ได้"; mobileInput.disabled = true;
-                loadDashboardBoxes(); // โหลดกล่องสถิติเมื่อเข้าหน้า Dashboard
+                loadDashboardBoxes(); 
             } else if (viewName === 'researchers') {
                 desktopInput.placeholder = "ค้นหานักวิจัย, ภาควิชา..."; desktopInput.disabled = false;
                 mobileInput.placeholder = "ค้นหา..."; mobileInput.disabled = false;
             } else if (viewName === 'publications') {
                 desktopInput.placeholder = "ค้นหาชื่อผลงาน, ผู้แต่ง, ปีที่พิมพ์..."; desktopInput.disabled = false;
                 mobileInput.placeholder = "ค้นหาผลงานตีพิมพ์..."; mobileInput.disabled = false;
-                loadAllFacultyPublicationsBackground(); // สั่งให้เริ่มดึงผลงานถ้ายังไม่ดึง
+                loadAllFacultyPublicationsBackground(); 
             } else if (viewName === 'innovation') {
                 desktopInput.placeholder = "ค้นหานวัตกรรม..."; desktopInput.disabled = false;
                 mobileInput.placeholder = "ค้นหา..."; mobileInput.disabled = false;
@@ -318,7 +318,6 @@
         let globalAllPublicationsData = []; 
         let isFetchingPublications = false; 
 
-        // ตัวแปรกราฟ
         let chartAreaInstance = null;
         let chartTypeInstance = null;
 
@@ -365,10 +364,6 @@
                 const response = await fetch(API_URL);
                 globalResearchersData = await response.json(); 
                 renderResearcherList(globalResearchersData);
-                
-                // สั่งโหลดกล่อง 3 กล่องแรกของ Dashboard ก่อนเลย
-                loadDashboardBoxes();
-
             } catch (error) {
                 const listContainer = document.getElementById('researcher-list');
                 if (listContainer) listContainer.innerHTML = '<div class="text-red-500 text-sm p-4 text-center mt-5 bg-red-50 rounded-lg border border-red-100">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
@@ -464,12 +459,13 @@
                 }
             }
 
-            document.getElementById('innovation-list').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-lightbulb text-3xl mb-3 text-gray-200"></i>รอเพิ่มข้อมูลนวัตกรรมของ ${person['ชื่อ-สกุล'] || ''}...</div>`;
+            document.getElementById('innovation-list').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-lightbulb text-3xl mb-3 text-gray-200"></i>รอเพิ่มข้อมูลนวัตกรรม...</div>`;
 
             fetchScopusMetrics(scopusId);
             fetchScopusPublications(scopusId);
         }
 
+        // 🌟 ดึงสรุปข้อมูลวิจัย 4 กล่อง (แบบทั้งหมด All-time ตามโครงสร้างเดิม)
         async function fetchScopusMetrics(scopusId) {
             const grid = document.getElementById('prof-metrics-grid');
             const dateLabel = document.getElementById('metrics-updated-date');
@@ -499,7 +495,8 @@
                 const coAuthorCount = authorData?.['coauthor-count'] ?? '-';
 
                 const today = new Date();
-                const dateStr = today.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+                const thaiYear = today.getFullYear() + 543;
+                const dateStr = today.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }) + ' ' + thaiYear;
                 dateLabel.innerText = `อัปเดตล่าสุด ${dateStr}`;
 
                 grid.innerHTML = `
@@ -596,66 +593,77 @@
         }
 
         // ==========================================
-        // 6. Dashboard (หน้าแรกเดิมของ Scopus)
+        // 6. Dashboard (ดึงข้อมูลแยก 2 ส่วน: 3 ปี และ 1 ปี)
         // ==========================================
         async function loadDashboardBoxes() {
             const metricsContainer = document.getElementById('dashboard-metrics');
             if(!metricsContainer) return;
 
+            const totalResearchers = globalResearchersData.length || 0;
+            const currentYear = new Date().getFullYear();
+
+            let facultyPubs3Years = '-';
+            let facultyPubsCurrent = '-';
+
             try {
-                const totalResearchers = globalResearchersData.length || 0;
-
-                const currentYear = new Date().getFullYear();
-                const startYear = currentYear - 4; 
-                const query = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR > ${startYear - 1}`;
-                const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&count=1`;
+                // ดึงผลรวมคณะ 3 ปีล่าสุด (กล่องเขียว)
+                const query3Years = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR > ${currentYear - 3}`;
+                const url3Years = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query3Years)}&count=1`;
                 
-                let facultyPubs = '-';
-                try {
-                    const res = await fetch(url, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' }});
-                    if (res.ok) {
-                        const data = await res.json();
-                        const total = data['search-results']?.['opensearch:totalResults'];
-                        if (total) facultyPubs = parseInt(total).toLocaleString();
-                    }
-                } catch(e) {}
+                // ดึงผลรวมคณะ ปีปัจจุบัน (กล่องม่วง)
+                const queryCurrent = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR = ${currentYear}`;
+                const urlCurrent = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(queryCurrent)}&count=1`;
 
-                let recentPubs = globalAllPublicationsData.length > 0 ? globalAllPublicationsData.length : '<i class="fa-solid fa-spinner fa-spin text-2xl"></i>';
+                const [res3, res1] = await Promise.all([
+                    fetch(url3Years, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' }}).catch(()=>null),
+                    fetch(urlCurrent, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' }}).catch(()=>null)
+                ]);
 
-                metricsContainer.innerHTML = `
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">นักวิจัยในระบบ</div>
-                        <div class="flex justify-between items-end">
-                            <span class="text-4xl font-extrabold text-blue-600">${totalResearchers}</span>
-                            <i class="fa-solid fa-users text-blue-100 text-4xl"></i>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">ผลงานคณะฯ (5 ปีล่าสุด)</div>
-                        <div class="flex justify-between items-end">
-                            <span class="text-4xl font-extrabold text-green-600">${facultyPubs}</span>
-                            <i class="fa-solid fa-building text-green-100 text-4xl"></i>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-purple-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">ผลงานในระบบ (2 ปีล่าสุด)</div>
-                        <div class="flex justify-between items-end">
-                            <span class="text-4xl font-extrabold text-purple-600" id="dash-recent-pubs">${recentPubs}</span>
-                            <i class="fa-solid fa-book-open text-purple-100 text-4xl"></i>
-                        </div>
-                    </div>
-                `;
+                if (res3 && res3.ok) {
+                    const data = await res3.json();
+                    const total = data['search-results']?.['opensearch:totalResults'];
+                    if (total) facultyPubs3Years = parseInt(total).toLocaleString();
+                }
+                if (res1 && res1.ok) {
+                    const data = await res1.json();
+                    const total = data['search-results']?.['opensearch:totalResults'];
+                    if (total) facultyPubsCurrent = parseInt(total).toLocaleString();
+                }
+            } catch(e) {}
 
-            } catch (error) {
-                metricsContainer.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10 text-red-500 bg-red-50 rounded-xl border border-red-100">เกิดข้อผิดพลาดในการโหลดข้อมูล Dashboard</div>`;
-            }
+            metricsContainer.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">นักวิจัยในระบบ</div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-4xl font-extrabold text-blue-600">${totalResearchers}</span>
+                        <i class="fa-solid fa-users text-blue-100 text-4xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">ผลงานคณะฯ (3 ปีย้อนหลัง)</div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-4xl font-extrabold text-green-600">${facultyPubs3Years}</span>
+                        <i class="fa-solid fa-building text-green-100 text-4xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-purple-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">ผลงานคณะฯ (ปีปัจจุบัน)</div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-4xl font-extrabold text-purple-600">${facultyPubsCurrent}</span>
+                        <i class="fa-solid fa-book-open text-purple-100 text-4xl"></i>
+                    </div>
+                </div>
+            `;
         }
 
         // ==========================================
-        // 7. ดึงข้อมูล Publications และสร้างกราฟ Dashboard
+        // 7. ดึงข้อมูล 3 ปีย้อนหลัง สำหรับ Publications และสร้างกราฟ
         // ==========================================
         function loadAllFacultyPublicationsBackground() {
             if (globalAllPublicationsData.length > 0) return; 
+            if (isFetchingPublications) return; 
+            isFetchingPublications = true;
+
             const validProfs = globalResearchersData.filter(p => {
                 let id = cleanScopusId(p['ScopusAuthorID']);
                 return id !== '' && id !== '-' && id !== 'ไม่มีข้อมูล';
@@ -663,7 +671,7 @@
             if (validProfs.length === 0) return;
 
             const currentYear = new Date().getFullYear();
-            const startYear = currentYear - 1; 
+            const startYear = currentYear - 2; 
             let allEntries = [];
             
             const batchSize = 10; 
@@ -675,6 +683,8 @@
                     return;
                 }
                 const batch = validProfs.slice(i, i + batchSize);
+                
+                // ใช้การ Query ทีละคนแบบช้าๆ แต่ได้ข้อมูลถูกคน 100%
                 const promises = batch.map(async (prof) => {
                     const scopusId = cleanScopusId(prof['ScopusAuthorID']);
                     const query = `AU-ID(${scopusId}) AND PUBYEAR > ${startYear - 1}`;
@@ -720,39 +730,12 @@
             globalAllPublicationsData = Array.from(uniqueMap.values());
             globalAllPublicationsData.sort((a, b) => (b['prism:coverDate'] || '').localeCompare(a['prism:coverDate'] || ''));
 
-            const dashRecent = document.getElementById('dash-recent-pubs');
-            if (dashRecent) dashRecent.innerText = globalAllPublicationsData.length;
-
             if (currentActiveView === 'publications') {
                 renderPublicationsTable(globalAllPublicationsData);
             }
 
             renderDashboardCharts(globalAllPublicationsData);
-        }
-
-        function filterPublicationsTable(searchTerm) {
-            if (globalAllPublicationsData.length === 0) return;
-            if (searchTerm === '') { renderPublicationsTable(globalAllPublicationsData); return; }
-
-            const filteredPubs = globalAllPublicationsData.filter(entry => {
-                const title = (entry['dc:title'] || '').toLowerCase();
-                const year = (entry['prism:coverDate'] || '').substring(0, 4);
-                const authorsNames = entry.facultyAuthors.map(p => (p['ชื่อ-สกุล'] || '').toLowerCase()).join(' ');
-                
-                return title.includes(searchTerm) || authorsNames.includes(searchTerm) || year.includes(searchTerm);
-            });
-
-            renderPublicationsTable(filteredPubs);
-        }
-
-        function filterInnovationsTable(searchTerm) {
-            const innoContainer = document.getElementById('all-faculty-inno-list');
-            if(!innoContainer) return;
-            if (searchTerm !== '') {
-                innoContainer.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-search text-3xl mb-2 text-gray-300 block"></i>ไม่พบนวัตกรรมที่ค้นหา</td></tr>`;
-            } else {
-                innoContainer.innerHTML = `<tr><td colspan="3" class="py-16 text-center text-gray-400"><i class="fa-solid fa-person-digging text-4xl mb-3 text-gray-300 block"></i><p>รอการนำเข้าข้อมูลนวัตกรรมจากฐานข้อมูล</p></td></tr>`;
-            }
+            isFetchingPublications = false;
         }
 
         function renderPublicationsTable(dataArray) {
@@ -766,7 +749,7 @@
                 dataArray.forEach(entry => {
                     const title = entry['dc:title'] || 'ไม่มีชื่อเรื่อง';
                     const year = entry['prism:coverDate'] ? entry['prism:coverDate'].substring(0, 4) : '';
-
+                    
                     let researchersHTML = entry.facultyAuthors.map(prof => {
                         let cleanId = cleanScopusId(prof['ScopusAuthorID']);
                         return `<button onclick="switchToResearcher('${cleanId}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${prof['ชื่อ-สกุล']}</button>`;
@@ -807,18 +790,11 @@
 
             dataArray.forEach(entry => {
                 const title = (entry['dc:title'] || '').toLowerCase();
-                
-                if(title.match(/learning|data|algorithm|fuzzy|neural|predict|classification|mining|intelligent|ai|optimization|deep/)) {
-                    areas['AI & Data Science']++;
-                } else if(title.match(/energy|power|grid|voltage|transformer|battery|solar|wind|inverter|bess|ev/)) {
-                    areas['Energy & Power']++;
-                } else if(title.match(/network|iot|sensor|wireless|communication|cloud|protocol|security/)) {
-                    areas['Network & IoT']++;
-                } else if(title.match(/material|stress|strain|thermal|fluid|heat|mechanic|steel|structure|concrete/)) {
-                    areas['Materials & Mechanics']++;
-                } else {
-                    areas['Others']++;
-                }
+                if(title.match(/learning|data|algorithm|fuzzy|neural|predict|classification|mining|intelligent|ai|optimization|deep/)) areas['AI & Data Science']++;
+                else if(title.match(/energy|power|grid|voltage|transformer|battery|solar|wind|inverter|bess|ev/)) areas['Energy & Power']++;
+                else if(title.match(/network|iot|sensor|wireless|communication|cloud|protocol|security/)) areas['Network & IoT']++;
+                else if(title.match(/material|stress|strain|thermal|fluid|heat|mechanic|steel|structure|concrete/)) areas['Materials & Mechanics']++;
+                else areas['Others']++;
 
                 const type = entry['subtypeDescription'] || 'Unknown';
                 types[type] = (types[type] || 0) + 1;
@@ -880,6 +856,46 @@
                         } 
                     }
                 });
+            }
+        }
+
+        // ฟังก์ชันช่วยเหลือระบบการค้นหาหน้า Publications
+        function filterPublicationsTable(searchTerm) {
+            if (globalAllPublicationsData.length === 0) return;
+            if (searchTerm === '') { renderPublicationsTable(globalAllPublicationsData); return; }
+
+            const filteredPubs = globalAllPublicationsData.filter(entry => {
+                const title = (entry['dc:title'] || '').toLowerCase();
+                const year = (entry['prism:coverDate'] || '').substring(0, 4);
+                const authorsNames = entry.facultyAuthors.map(p => (p['ชื่อ-สกุล'] || '').toLowerCase()).join(' ');
+                
+                return title.includes(searchTerm) || authorsNames.includes(searchTerm) || year.includes(searchTerm);
+            });
+
+            renderPublicationsTable(filteredPubs);
+        }
+
+        function filterInnovationsTable(searchTerm) {
+            const innoContainer = document.getElementById('all-faculty-inno-list');
+            if(!innoContainer) return;
+            if (searchTerm !== '') {
+                innoContainer.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-search text-3xl mb-2 text-gray-300 block"></i>ไม่พบนวัตกรรมที่ค้นหา</td></tr>`;
+            } else {
+                innoContainer.innerHTML = `<tr><td colspan="3" class="py-16 text-center text-gray-400"><i class="fa-solid fa-person-digging text-4xl mb-3 text-gray-300 block"></i><p>รอการนำเข้าข้อมูลนวัตกรรมจากฐานข้อมูล</p></td></tr>`;
+            }
+        }
+
+        function switchToResearcher(scopusId) {
+            switchView('researchers');
+            let targetId = cleanScopusId(scopusId);
+            const listContainer = document.getElementById('researcher-list');
+            let prof = globalResearchersData.find(p => cleanScopusId(p['ScopusAuthorID']) === targetId);
+            if (prof) {
+                let targetElement = null;
+                for (let child of listContainer.children) {
+                    if (child.innerText.includes(prof['ชื่อ-สกุล'])) { targetElement = child; break; }
+                }
+                updateProfile(prof, targetElement, true);
             }
         }
 
