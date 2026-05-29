@@ -17,6 +17,51 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+        
+        /* Tooltip Style */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 10px 12px;
+            position: absolute;
+            z-index: 50;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 11px;
+            font-weight: 300;
+            line-height: 1.5;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            text-transform: none;
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        @media (max-width: 768px) {
+            .tooltip-text { width: 200px; }
+        }
     </style>
 </head>
 <body class="fixed inset-0 flex flex-col text-gray-800 bg-gray-50 overflow-hidden">
@@ -186,7 +231,7 @@
                 <div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-2">
                     <div>
                         <h2 class="text-xl lg:text-2xl font-bold text-gray-800">ภาพรวมงานวิจัย (Research Dashboard)</h2>
-                        <p class="text-sm text-gray-500 mt-1">คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่ <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs ml-2">Powered by Scopus</span></p>
+                        <p class="text-sm text-gray-500 mt-1">คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่</p>
                         <p class="text-[11px] lg:text-xs text-gray-400 mt-1.5"><i class="fa-solid fa-info-circle mr-1"></i>ข้อมูลอ้างอิงจากฐานข้อมูล Scopus ภายใต้สังกัด 'Faculty of Engineering' และ 'Chiang Mai University'</p>
                     </div>
                 </div>
@@ -199,17 +244,29 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 pb-6">
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
-                        <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2 text-[13px] lg:text-sm">สัดส่วนหัวข้อวิจัย (Research Areas) <span class="text-gray-400 font-normal text-xs ml-1">(3 ปีย้อนหลัง)</span></h3>
+                        <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-2">
+                            <h3 class="font-bold text-gray-800 text-[13px] lg:text-sm">สัดส่วนหัวข้อวิจัย (Research Areas) <span class="text-gray-400 font-normal text-xs ml-1">(3 ปีย้อนหลัง)</span></h3>
+                            <div class="tooltip-container">
+                                <i class="fa-solid fa-info-circle text-gray-300 hover:text-gray-500"></i>
+                                <span class="tooltip-text"><b>วิธีคิด:</b> อ้างอิงจากผลงานของคณะฯ (AF-ID) 3 ปีย้อนหลัง จากฐานข้อมูล Scopus (วิเคราะห์จาก 200 ผลงานล่าสุด) แล้วนำมาวิเคราะห์ด้วย Keyword อัตโนมัติ</span>
+                            </div>
+                        </div>
                         <div class="flex-1 relative min-h-[280px] flex items-center justify-center">
                             <canvas id="chart-area"></canvas>
-                            <div id="chart-area-loading" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm bg-white"><i class="fa-solid fa-spinner fa-spin mr-2"></i>รอการประมวลผลข้อมูลผลงานตีพิมพ์...</div>
+                            <div id="chart-area-loading" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm bg-white"><i class="fa-solid fa-spinner fa-spin mr-2"></i>รอการประมวลผลข้อมูลผลงานคณะ...</div>
                         </div>
                     </div>
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
-                        <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2 text-[13px] lg:text-sm">ประเภทผลงาน (Document Types) <span class="text-gray-400 font-normal text-xs ml-1">(3 ปีย้อนหลัง)</span></h3>
+                        <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-2">
+                            <h3 class="font-bold text-gray-800 text-[13px] lg:text-sm">ประเภทผลงาน (Document Types) <span class="text-gray-400 font-normal text-xs ml-1">(3 ปีย้อนหลัง)</span></h3>
+                            <div class="tooltip-container">
+                                <i class="fa-solid fa-info-circle text-gray-300 hover:text-gray-500"></i>
+                                <span class="tooltip-text"><b>วิธีคิด:</b> สัดส่วนประเภทเอกสารวิจัยของคณะฯ อ้างอิงจากฟิลด์ subtypeDescription (วิเคราะห์จาก 200 ผลงานล่าสุด)</span>
+                            </div>
+                        </div>
                         <div class="flex-1 relative min-h-[280px] flex items-center justify-center">
                             <canvas id="chart-type"></canvas>
-                            <div id="chart-type-loading" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm bg-white"><i class="fa-solid fa-spinner fa-spin mr-2"></i>รอการประมวลผลข้อมูลผลงานตีพิมพ์...</div>
+                            <div id="chart-type-loading" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm bg-white"><i class="fa-solid fa-spinner fa-spin mr-2"></i>รอการประมวลผลข้อมูลผลงานคณะ...</div>
                         </div>
                     </div>
                 </div>
@@ -314,13 +371,15 @@
         const TABLE_NAME = 'นักวิจัย'; 
         const SCOPUS_API_KEY = '233469672124ca85d252ec13abe9ced5';
         
-        // 🌟 ตั้งค่าปีปัจจุบัน สำหรับใช้อ้างอิงการดึงข้อมูล
-        const CURRENT_YEAR = new Date().getFullYear();
-
+        const CURRENT_YEAR = new Date().getFullYear(); 
+        
         let globalResearchersData = []; 
         let currentActiveScopusId = null; 
         let globalAllPublicationsData = []; 
         let isFetchingPublications = false; 
+
+        // ตัวแปรเช็คการโหลดกราฟของคณะ
+        let isFacultyChartsLoaded = false;
 
         let chartAreaInstance = null;
         let chartTypeInstance = null;
@@ -369,8 +428,7 @@
                 globalResearchersData = await response.json(); 
                 renderResearcherList(globalResearchersData);
                 
-                // โหลดกล่อง Dashboard เบื้องหลัง
-                loadDashboardBoxes();
+                loadAllFacultyPublicationsBackground();
 
             } catch (error) {
                 const listContainer = document.getElementById('researcher-list');
@@ -599,59 +657,97 @@
         }
 
         // ==========================================
-        // 6. Dashboard (ผลงานคณะ และ สถิติ)
+        // 6. Dashboard (ดึงข้อมูล 3 ปี และ 1 ปี + โหลดกราฟของคณะ)
         // ==========================================
         async function loadDashboardBoxes() {
             const metricsContainer = document.getElementById('dashboard-metrics');
             if(!metricsContainer) return;
 
             try {
-                const totalResearchers = globalResearchersData.length || 0;
-
+                // กล่องเขียว: ผลงานคณะ 3 ปีล่าสุด
                 const startYear = CURRENT_YEAR - 2; 
-                const query = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR > ${startYear - 1}`;
-                const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&count=1`;
+                const query3Years = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR > ${startYear - 1}`;
+                const url3Years = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query3Years)}&count=1`;
                 
-                let facultyPubs = '-';
-                try {
-                    const res = await fetch(url, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' }});
-                    if (res.ok) {
-                        const data = await res.json();
-                        const total = data['search-results']?.['opensearch:totalResults'];
-                        if (total) facultyPubs = parseInt(total).toLocaleString();
-                    }
-                } catch(e) {}
+                // กล่องม่วง: ผลงานคณะเฉพาะปีปัจจุบัน
+                const queryCurrent = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR = ${CURRENT_YEAR}`;
+                const urlCurrent = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(queryCurrent)}&count=1`;
 
-                // 🌟 กล่องสีม่วง: กรองหาเฉพาะปีปัจจุบัน
-                let recentPubs = '<i class="fa-solid fa-spinner fa-spin text-2xl"></i>';
+                let facultyPubs3Years = '-';
+                let facultyPubsCurrent = '-';
+
+                const [res3, res1] = await Promise.all([
+                    fetch(url3Years, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' }}).catch(()=>null),
+                    fetch(urlCurrent, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' }}).catch(()=>null)
+                ]);
+
+                if (res3 && res3.ok) {
+                    const data = await res3.json();
+                    const total = data['search-results']?.['opensearch:totalResults'];
+                    if (total) facultyPubs3Years = parseInt(total).toLocaleString();
+                }
+                if (res1 && res1.ok) {
+                    const data = await res1.json();
+                    const total = data['search-results']?.['opensearch:totalResults'];
+                    if (total) facultyPubsCurrent = parseInt(total).toLocaleString();
+                }
+
+                // ข้อมูลกล่องแดง (Citation) รอให้ดึง Publication เสร็จก่อนถึงจะขึ้นเลข
+                let totalCitations = '<i class="fa-solid fa-spinner fa-spin text-xl"></i>';
                 if (globalAllPublicationsData.length > 0) {
                     const currentYearPubs = globalAllPublicationsData.filter(pub => {
                         const year = pub['prism:coverDate'] ? pub['prism:coverDate'].substring(0, 4) : '';
                         return year == CURRENT_YEAR;
                     });
-                    recentPubs = currentYearPubs.length.toLocaleString();
+                    
+                    let citCount = 0;
+                    currentYearPubs.forEach(pub => {
+                        const cit = parseInt(pub['citedby-count']);
+                        if (!isNaN(cit)) citCount += cit;
+                    });
+                    totalCitations = citCount.toLocaleString();
                 }
 
                 metricsContainer.innerHTML = `
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">นักวิจัยในระบบ</div>
-                        <div class="flex justify-between items-end">
-                            <span class="text-4xl font-extrabold text-blue-600">${totalResearchers}</span>
-                            <i class="fa-solid fa-users text-blue-100 text-4xl"></i>
-                        </div>
-                    </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">ผลงานคณะฯ (3 ปีย้อนหลัง)</div>
-                        <div class="flex justify-between items-end">
-                            <span class="text-4xl font-extrabold text-green-600">${facultyPubs}</span>
+                        <div class="flex justify-between items-center mb-2 border-b border-gray-50 pb-2">
+                            <span class="text-[13px] text-gray-500 font-semibold tracking-wide uppercase">ผลงานคณะฯ (3 ปีล่าสุด)</span>
+                            <div class="tooltip-container">
+                                <i class="fa-solid fa-info-circle text-gray-300 hover:text-gray-500"></i>
+                                <span class="tooltip-text"><b>วิธีคิด:</b> จำนวนผลงานตีพิมพ์รวมของ "คณะวิศวกรรมศาสตร์ มช." ในระยะเวลา 3 ปีล่าสุด (ดึงข้อมูลจาก Scopus โดยตรง)</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end mt-2">
+                            <span class="text-4xl font-extrabold text-green-600">${facultyPubs3Years}</span>
                             <i class="fa-solid fa-building text-green-100 text-4xl"></i>
                         </div>
                     </div>
+
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-purple-100 flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <div class="text-[13px] text-gray-500 mb-2 font-semibold tracking-wide uppercase">ผลงานในระบบ (ปีปัจจุบัน)</div>
-                        <div class="flex justify-between items-end">
-                            <span class="text-4xl font-extrabold text-purple-600" id="dash-recent-pubs">${recentPubs}</span>
+                        <div class="flex justify-between items-center mb-2 border-b border-gray-50 pb-2">
+                            <span class="text-[13px] text-gray-500 font-semibold tracking-wide uppercase">ผลงานคณะฯ (ปีปัจจุบัน)</span>
+                            <div class="tooltip-container">
+                                <i class="fa-solid fa-info-circle text-gray-300 hover:text-gray-500"></i>
+                                <span class="tooltip-text"><b>วิธีคิด:</b> จำนวนผลงานตีพิมพ์รวมของ "คณะวิศวกรรมศาสตร์ มช." ที่ตีพิมพ์เฉพาะในปี ${CURRENT_YEAR} (ดึงข้อมูลจาก Scopus โดยตรง)</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end mt-2">
+                            <span class="text-4xl font-extrabold text-purple-600">${facultyPubsCurrent}</span>
                             <i class="fa-solid fa-book-open text-purple-100 text-4xl"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-red-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-center mb-2 border-b border-gray-50 pb-2">
+                            <span class="text-[13px] text-gray-500 font-semibold tracking-wide uppercase">Citations คณะฯ (ปีปัจจุบัน)</span>
+                            <div class="tooltip-container">
+                                <i class="fa-solid fa-info-circle text-gray-300 hover:text-gray-500"></i>
+                                <span class="tooltip-text"><b>วิธีคิด:</b> ยอดอ้างอิงรวม (Citation Count) ของผลงานทั้งหมดที่ "นักวิจัยในระบบ" ตีพิมพ์ในปี ${CURRENT_YEAR}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end mt-2">
+                            <span class="text-4xl font-extrabold text-red-600" id="dash-recent-citations">${totalCitations}</span>
+                            <i class="fa-solid fa-quote-right text-red-100 text-4xl"></i>
                         </div>
                     </div>
                 `;
@@ -659,20 +755,60 @@
             } catch (error) {
                 metricsContainer.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10 text-red-500 bg-red-50 rounded-xl border border-red-100">เกิดข้อผิดพลาดในการโหลดข้อมูล Dashboard</div>`;
             }
+
+            // [NEW] โหลดข้อมูลกราฟของคณะ ถ้ายังไม่ได้โหลด
+            if (!isFacultyChartsLoaded) {
+                fetchFacultyDataForCharts();
+                isFacultyChartsLoaded = true;
+            }
         }
 
         // ==========================================
-        // 7. ดึงข้อมูล 3 ปีย้อนหลัง สำหรับ Publications และสร้างกราฟ Dashboard
+        // [ฟังก์ชันใหม่] ดึงข้อมูลผลงานคณะ (AF-ID) เพื่อวาดกราฟ
+        // ==========================================
+        async function fetchFacultyDataForCharts() {
+            const loadingArea = document.getElementById('chart-area-loading');
+            const loadingType = document.getElementById('chart-type-loading');
+            if(loadingArea) loadingArea.classList.remove('hidden');
+            if(loadingType) loadingType.classList.remove('hidden');
+
+            const startYear = CURRENT_YEAR - 2;
+            const query = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR > ${startYear - 1}`;
+            // ดึงผลงานล่าสุดของคณะ (จำกัด 200 รายการเพื่อไม่ให้เกิน Limit API แต่เพียงพอสำหรับการดูแนวโน้ม)
+            const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&count=200&sort=-coverDate`;
+
+            try {
+                const response = await fetch(url, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' } });
+                if (response.ok) {
+                    const data = await response.json();
+                    const entries = data['search-results']['entry'] || [];
+                    renderDashboardCharts(entries);
+                } else {
+                    throw new Error('API Limit or Fetch Error');
+                }
+            } catch (error) {
+                console.error("Error fetching faculty charts data", error);
+                if(loadingArea) loadingArea.innerHTML = '<span class="text-red-400">โหลดข้อมูลกราฟล้มเหลว</span>';
+                if(loadingType) loadingType.innerHTML = '<span class="text-red-400">โหลดข้อมูลกราฟล้มเหลว</span>';
+            }
+        }
+
+        // ==========================================
+        // 7. ดึงข้อมูล 3 ปีย้อนหลัง สำหรับ Publications จากฐานข้อมูล Spreadsheet
         // ==========================================
         function loadAllFacultyPublicationsBackground() {
             if (globalAllPublicationsData.length > 0) return; 
+            if (isFetchingPublications) return; 
+            isFetchingPublications = true;
+
             const validProfs = globalResearchersData.filter(p => {
                 let id = cleanScopusId(p['ScopusAuthorID']);
                 return id !== '' && id !== '-' && id !== 'ไม่มีข้อมูล';
             });
             if (validProfs.length === 0) return;
 
-            const startYear = CURRENT_YEAR - 2; 
+            const currentYear = new Date().getFullYear();
+            const startYear = currentYear - 2; 
             let allEntries = [];
             
             const batchSize = 10; 
@@ -684,6 +820,7 @@
                     return;
                 }
                 const batch = validProfs.slice(i, i + batchSize);
+                
                 const promises = batch.map(async (prof) => {
                     const scopusId = cleanScopusId(prof['ScopusAuthorID']);
                     const query = `AU-ID(${scopusId}) AND PUBYEAR > ${startYear - 1}`;
@@ -729,25 +866,69 @@
             globalAllPublicationsData = Array.from(uniqueMap.values());
             globalAllPublicationsData.sort((a, b) => (b['prism:coverDate'] || '').localeCompare(a['prism:coverDate'] || ''));
 
-            // อัปเดตตัวเลขในกล่องม่วงเมื่อข้อมูลโหลดเสร็จ
-            const dashRecent = document.getElementById('dash-recent-pubs');
-            if (dashRecent) {
+            // อัปเดตตัวเลข Citation บน Dashboard (เมื่อโหลดเปเปอร์เสร็จ)
+            const dashCitations = document.getElementById('dash-recent-citations');
+            if (dashCitations) {
                 const currentYearPubs = globalAllPublicationsData.filter(pub => {
                     const year = pub['prism:coverDate'] ? pub['prism:coverDate'].substring(0, 4) : '';
                     return year == CURRENT_YEAR;
                 });
-                dashRecent.innerText = currentYearPubs.length.toLocaleString();
+                
+                let citCount = 0;
+                currentYearPubs.forEach(pub => {
+                    const cit = parseInt(pub['citedby-count']);
+                    if (!isNaN(cit)) citCount += cit;
+                });
+                dashCitations.innerText = citCount.toLocaleString();
             }
 
             if (currentActiveView === 'publications') {
                 renderPublicationsTable(globalAllPublicationsData);
             }
+            
+            // [ลบออก] ไม่ใช้ globalAllPublicationsData ของ Spreadsheet ไปแสดงผลกราฟแล้ว
+            // renderDashboardCharts(globalAllPublicationsData);
+            isFetchingPublications = false;
+        }
 
-            renderDashboardCharts(globalAllPublicationsData);
+        function renderPublicationsTable(dataArray) {
+            const container = document.getElementById('all-faculty-pub-list');
+            if(!container) return;
+
+            let resultHTML = '';
+            if (dataArray.length === 0) {
+                resultHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-search text-3xl mb-2 text-gray-300 block"></i>ไม่พบผลงานที่ค้นหา</td></tr>`;
+            } else {
+                dataArray.forEach(entry => {
+                    const title = entry['dc:title'] || 'ไม่มีชื่อเรื่อง';
+                    const year = entry['prism:coverDate'] ? entry['prism:coverDate'].substring(0, 4) : '';
+                    
+                    let researchersHTML = entry.facultyAuthors.map(prof => {
+                        let cleanId = cleanScopusId(prof['ScopusAuthorID']);
+                        return `<button onclick="switchToResearcher('${cleanId}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${prof['ชื่อ-สกุล']}</button>`;
+                    }).join('<span class="text-gray-300 mx-2 hidden lg:inline">|</span><br class="lg:hidden">');
+
+                    let scopusLink = '#';
+                    if (entry.eid) scopusLink = `https://www.scopus.com/record/display.uri?eid=${entry.eid}&origin=resultslist`;
+
+                    resultHTML += `
+                        <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
+                            <td class="py-3 lg:py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px]">${title} <span class="text-[10px] lg:text-xs text-gray-400 font-normal ml-1">(${year})</span></td>
+                            <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-sm">${researchersHTML}</td>
+                            <td class="py-3 lg:py-4 text-center">
+                                <a href="${scopusLink}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] lg:text-xs"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            container.innerHTML = resultHTML;
         }
 
         // ==========================================
-        // 8. 🌟 วาดกราฟและตัวเลขบน Dashboard 🌟
+        // 8. วาดกราฟบน Dashboard 
         // ==========================================
         function renderDashboardCharts(dataArray) {
             const loadingArea = document.getElementById('chart-area-loading');
@@ -772,7 +953,6 @@
                 types[type] = (types[type] || 0) + 1;
             });
 
-            // คำนวณเปอร์เซ็นต์สำหรับใส่ท้าย Legend
             const totalAreas = Object.values(areas).reduce((a, b) => a + b, 0);
             const areaLabels = Object.keys(areas).map(key => {
                 const pct = totalAreas > 0 ? Math.round((areas[key] / totalAreas) * 100) : 0;
@@ -785,7 +965,6 @@
                 return `${key} (${pct}%)`;
             });
 
-            // 🌟 ให้โชว์ตัวเลขทับบนกราฟเฉพาะ "3 อันดับแรก" ที่มีค่ามากที่สุด เพื่อไม่ให้เบียดกัน
             const datalabelsConfig = {
                 color: '#ffffff',
                 font: { family: 'Prompt', weight: 'bold', size: 11 },
@@ -793,20 +972,18 @@
                     if (value === 0) return null; 
                     const dataset = context.chart.data.datasets[0].data;
                     
-                    // หา index ของ 3 อันดับแรก
                     const top3Indices = dataset
                         .map((val, idx) => ({ val, idx }))
                         .sort((a, b) => b.val - a.val)
                         .slice(0, 3)
                         .map(item => item.idx);
 
-                    // ถ้าค่าปัจจุบันอยู่ใน 3 อันดับแรก ให้แสดง
                     if (top3Indices.includes(context.dataIndex)) {
                         const total = dataset.reduce((a, b) => a + b, 0);
                         const percentage = Math.round((value / total) * 100) + '%';
                         return `${value}\n(${percentage})`; 
                     }
-                    return null; // อันที่เหลือน้อยๆ ซ่อนไว้
+                    return null; 
                 },
                 textAlign: 'center'
             };
@@ -817,7 +994,7 @@
                 chartAreaInstance = new Chart(ctxArea, {
                     type: 'doughnut',
                     data: {
-                        labels: areaLabels, // ใช้ Label ที่มี %
+                        labels: areaLabels, 
                         datasets: [{
                             data: Object.values(areas),
                             backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#9ca3af'],
@@ -840,7 +1017,7 @@
                 chartTypeInstance = new Chart(ctxType, {
                     type: 'pie',
                     data: {
-                        labels: typeLabels, // ใช้ Label ที่มี %
+                        labels: typeLabels, 
                         datasets: [{
                             data: Object.values(types),
                             backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#6b7280', '#06b6d4', '#ec4899', '#8b5cf6'],
@@ -858,9 +1035,7 @@
             }
         }
 
-        // ==========================================
-        // 9. ฟังก์ชันตารางและค้นหา
-        // ==========================================
+        // ฟังก์ชันช่วยเหลือระบบค้นหา
         function filterPublicationsTable(searchTerm) {
             if (globalAllPublicationsData.length === 0) return;
             if (searchTerm === '') { renderPublicationsTable(globalAllPublicationsData); return; }
@@ -884,42 +1059,6 @@
             } else {
                 innoContainer.innerHTML = `<tr><td colspan="3" class="py-16 text-center text-gray-400"><i class="fa-solid fa-person-digging text-4xl mb-3 text-gray-300 block"></i><p>รอการนำเข้าข้อมูลนวัตกรรมจากฐานข้อมูล</p></td></tr>`;
             }
-        }
-
-        function renderPublicationsTable(dataArray) {
-            const container = document.getElementById('all-faculty-pub-list');
-            if(!container) return;
-
-            let resultHTML = '';
-            if (dataArray.length === 0) {
-                resultHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-search text-3xl mb-2 text-gray-300 block"></i>ไม่พบผลงานที่ค้นหา</td></tr>`;
-            } else {
-                dataArray.forEach(entry => {
-                    const title = entry['dc:title'] || 'ไม่มีชื่อเรื่อง';
-                    const year = entry['prism:coverDate'] ? entry['prism:coverDate'].substring(0, 4) : '';
-
-                    let researchersHTML = entry.facultyAuthors.map(prof => {
-                        let cleanId = cleanScopusId(prof['ScopusAuthorID']);
-                        return `<button onclick="switchToResearcher('${cleanId}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${prof['ชื่อ-สกุล']}</button>`;
-                    }).join('<span class="text-gray-300 mx-2 hidden lg:inline">|</span><br class="lg:hidden">');
-
-                    let scopusLink = '#';
-                    if (entry.eid) scopusLink = `https://www.scopus.com/record/display.uri?eid=${entry.eid}&origin=resultslist`;
-
-                    resultHTML += `
-                        <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
-                            <td class="py-3 lg:py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px]">${title} <span class="text-[10px] lg:text-xs text-gray-400 font-normal ml-1">(${year})</span></td>
-                            <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-sm">${researchersHTML}</td>
-                            <td class="py-3 lg:py-4 text-center">
-                                <a href="${scopusLink}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
-                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] lg:text-xs"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-            container.innerHTML = resultHTML;
         }
 
         function switchToResearcher(scopusId) {
