@@ -775,7 +775,7 @@
             const startYear = CURRENT_YEAR - 2;
             const query = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR = ${CURRENT_YEAR}`;
             // ดึงผลงานล่าสุดของคณะ (จำกัด 200 รายการเพื่อไม่ให้เกิน Limit API แต่เพียงพอสำหรับการดูแนวโน้ม)
-            const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&count=200&sort=-coverDate`;
+            const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&count=1000&sort=-coverDate`;
 
             try {
                 const response = await fetch(url, { headers: { 'X-ELS-APIKey': SCOPUS_API_KEY, 'Accept': 'application/json' } });
