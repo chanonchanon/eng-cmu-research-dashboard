@@ -599,11 +599,15 @@
                  return;
             }
             
-            const profInnos = globalInnovationsData.filter(inno => {
-                const mainOwner = (inno['เจ้าของหลัก'] || '').trim();
-                const coOwners = (inno['ผู้ร่วม'] || '').split(',').map(s => s.trim());
-                return mainOwner === profName || coOwners.includes(profName);
-            });
+         const profInnos = globalInnovationsData.filter(inno => {
+             const mainOwner = (inno['ผู้ผลิตหลัก'] || '').trim();
+              const coOwners = [];
+           // วนลูปดึงชื่อผู้ผลิตร่วม 1 ถึง 9 จาก Sheet
+            for(let i=1; i<=9; i++) {
+               if(inno[`ผู้ผลิตร่วม ${i}`]) coOwners.push(inno[`ผู้ผลิตร่วม ${i}`].trim());
+                    }
+                   return mainOwner === profName || coOwners.includes(profName);
+                     }););
 
             if (profInnos.length === 0) {
                 innoContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-folder-open text-3xl mb-3 text-gray-200"></i>ไม่มีข้อมูลนวัตกรรม</div>`;
@@ -611,7 +615,7 @@
                 let innoHtml = '<div class="space-y-2">';
                 profInnos.forEach(inno => {
                     const title = inno['ชื่อผลงาน'] || 'ไม่ระบุชื่อ';
-                    const mainOwner = (inno['เจ้าของหลัก'] || '').trim();
+                    const mainOwner = (inno['ผู้ผลิตหลัก'] || '').trim();
                     const isMain = (mainOwner === profName);
                     
                     const badge = isMain
@@ -1143,8 +1147,12 @@
             } else {
                 dataArray.forEach(entry => {
                     const title = entry['ชื่อผลงาน'] || 'ไม่มีชื่อผลงาน';
-                    const mainOwner = entry['เจ้าของหลัก'] || '-';
-                    const coOwners = entry['ผู้ร่วม'] || '-';
+                    const mainOwner = entry['ผู้ผลิตหลัก'] || '-';
+                    const coOwnersArr = [];
+                          for(let i=1; i<=9; i++) {
+                          if(entry[`ผู้ผลิตร่วม ${i}`]) coOwnersArr.push(entry[`ผู้ผลิตร่วม ${i}`].trim());
+                          }
+                    const coOwners = coOwnersArr.length > 0 ? coOwnersArr.join(', ') : '-';
                     
                     resultHTML += `
                         <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
@@ -1179,11 +1187,14 @@
             if (searchTerm === '') { renderAllInnovationsTable(globalInnovationsData); return; }
 
             const filteredInnos = globalInnovationsData.filter(entry => {
-                const title = (entry['ชื่อผลงาน'] || '').toLowerCase();
-                const mainOwner = (entry['เจ้าของหลัก'] || '').toLowerCase();
-                const coOwners = (entry['ผู้ร่วม'] || '').toLowerCase();
-                
-                return title.includes(searchTerm) || mainOwner.includes(searchTerm) || coOwners.includes(searchTerm);
+                const mainOwner = (entry['ผู้ผลิตหลัก'] || '').toLowerCase();
+                const coOwnersArr = [];
+                   for(let i=1; i<=9; i++) {
+                   if(entry[`ผู้ผลิตร่วม ${i}`]) coOwnersArr.push(entry[`ผู้ผลิตร่วม ${i}`].toLowerCase());
+                     }
+                   const coOwnersStr = coOwnersArr.join(' ');
+
+             return title.includes(searchTerm) || mainOwner.includes(searchTerm) || coOwnersStr.includes(searchTerm);
             });
 
             renderAllInnovationsTable(filteredInnos);
