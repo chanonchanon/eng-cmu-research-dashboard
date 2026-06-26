@@ -219,16 +219,17 @@
                         <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-lightbulb text-red-700 mr-2"></i>ผลงานนวัตกรรมทั้งหมด (All Innovations)</h3>
                     </div>
                     <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
-                        <table class="w-full text-sm text-left border-collapse min-w-[600px] lg:min-w-full">
+                        <table class="w-full text-sm text-left border-collapse min-w-[800px] lg:min-w-full">
                             <thead class="sticky top-0 bg-white z-10 shadow-sm shadow-gray-50">
                                 <tr class="text-gray-400 border-b border-gray-100 text-xs lg:text-sm">
-                                    <th class="pb-3 font-medium pl-2 w-3/5">ชื่อผลงานนวัตกรรม</th>
-                                    <th class="pb-3 font-medium w-1/4">เจ้าของหลัก</th>
-                                    <th class="pb-3 font-medium w-20">ผู้ร่วม</th>
+                                    <th class="pb-3 font-medium pl-2 w-2/5">ชื่องานนวัตกรรม</th>
+                                    <th class="pb-3 font-medium w-1/5">ข้อมูลการจดทะเบียน</th>
+                                    <th class="pb-3 font-medium w-1/5">ผู้ผลิตหลัก</th>
+                                    <th class="pb-3 font-medium w-1/5">ผู้ร่วม</th>
                                 </tr>
                             </thead>
                             <tbody id="all-faculty-inno-list" class="divide-y divide-gray-50">
-                                <tr><td colspan="3" class="py-10 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังรอการโหลดข้อมูล...</td></tr>
+                                <tr><td colspan="4" class="py-10 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังรอการโหลดข้อมูล...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -375,10 +376,7 @@
         // 2. Data & API Configuration
         // ==========================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbzMQCzrpCaXKUyRoZjBF0he-8OrAgKPtmK1zIEiTer-G4kGhDWrvR-3HrEech436VKu/exec';
-        
-        // 🟢 URL API ของนวัตกรรมที่คุณเพิ่งให้มา 🟢
         const INNO_API_URL = 'https://script.google.com/macros/s/AKfycbwRSWLGGdC-Bykq7JzETNsRCjr6txzUglCvrFcdL4R_5xHB8UbubTQWbkeNJXjUA9Vn/exec'; 
-        
 
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
         const TABLE_NAME = 'นักวิจัย'; 
@@ -433,10 +431,9 @@
         mobileSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
 
         // ==========================================
-        // 4. โหลดข้อมูลอาจารย์ และ นวัตกรรม (แยก Try-Catch ชัดเจน)
+        // 4. โหลดข้อมูลอาจารย์ และ นวัตกรรม 
         // ==========================================
         async function loadData() {
-            // ดึงข้อมูลนักวิจัย (ถ้าพัง คือหยุดแค่นี้)
             try {
                 const response = await fetch(API_URL);
                 globalResearchersData = await response.json(); 
@@ -449,20 +446,14 @@
                 return; 
             }
 
-            // ดึงข้อมูลนวัตกรรม (ถ้าพัง จะไม่กระทบข้อมูลนักวิจัย)
             try {
-                // ใส่ redirect: 'follow' เพื่อให้มั่นใจว่าถ้ายิงไป Google Apps Script แล้วติด Redirect มันจะตามไปเอาข้อมูลให้
                 const innoResponse = await fetch(INNO_API_URL, { redirect: "follow" });
-                
                 if (!innoResponse.ok) throw new Error("API นวัตกรรมตอบกลับไม่สำเร็จ");
 
-                // อ่านค่ามาเป็น text ก่อน เผื่อ Google ส่งหน้า HTML login กลับมา เราจะได้ไม่พังตอน .json()
                 const innoText = await innoResponse.text();
-                
                 try {
                     globalInnovationsData = JSON.parse(innoText);
                 } catch(e) {
-                    console.error("รูปแบบข้อมูลจาก API นวัตกรรมไม่ใช่ JSON (อาจเป็นหน้า Login):", innoText);
                     throw new Error("รูปแบบข้อมูลจาก API นวัตกรรมไม่ถูกต้อง");
                 }
 
@@ -470,22 +461,24 @@
                     throw new Error(globalInnovationsData.error);
                 }
                 
+                // เรียงลำดับปีจากใหม่ไปเก่า
+                globalInnovationsData.sort((a, b) => {
+                    const yearA = parseInt(a['ปีของผลงาน']) || 0;
+                    const yearB = parseInt(b['ปีของผลงาน']) || 0;
+                    return yearB - yearA;
+                });
+
                 renderAllInnovationsTable(globalInnovationsData);
 
-                // หากมีโปรไฟล์เปิดอยู่ ให้เรนเดอร์ข้อมูลนวัตกรรมส่วนตัวด้วย
                 const activeName = document.getElementById('prof-name-th').innerText;
                 if (activeName && activeName !== '-') {
                     renderProfileInnovations(activeName);
                 }
 
             } catch (error) {
-                console.error("Innovation Load Error:", error);
-                
-                // แจ้งเตือนลงไปที่ตารางนวัตกรรมรวม (หน้าเมนูนวัตกรรม)
                 const innoContainer = document.getElementById('all-faculty-inno-list');
-                if (innoContainer) innoContainer.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-sm">เกิดข้อผิดพลาดในการโหลดข้อมูลนวัตกรรม<br><span class="text-xs text-red-400">(กรุณาตรวจสอบสิทธิ์การแชร์ของ Google Sheet API)</span></td></tr>`;
+                if (innoContainer) innoContainer.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-red-500 bg-red-50 rounded-lg text-sm">เกิดข้อผิดพลาดในการโหลดข้อมูลนวัตกรรม<br><span class="text-xs text-red-400">(กรุณาตรวจสอบสิทธิ์การแชร์ของ Google Sheet API)</span></td></tr>`;
                 
-                // แจ้งเตือนลงไปที่กล่องนวัตกรรมส่วนตัว (หน้าโปรไฟล์นักวิจัย)
                 const profInnoContainer = document.getElementById('innovation-list');
                 if (profInnoContainer) profInnoContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-red-400 text-sm py-10"><i class="fa-solid fa-triangle-exclamation text-3xl mb-3 text-red-200"></i>โหลดข้อมูลนวัตกรรมล้มเหลว</div>`;
             }
@@ -581,23 +574,18 @@
                 }
             }
 
-            // เรนเดอร์นวัตกรรมในหน้าโปรไฟล์
             renderProfileInnovations(profName);
 
-            // สั่งดึงข้อมูล Scopus
             fetchScopusMetrics(scopusId);
             fetchScopusPublications(scopusId);
         }
 
-        // ฟังก์ชันแยกสำหรับเรนเดอร์นวัตกรรมในกล่องส่วนตัว
+        // 🟢 เรนเดอร์รายการนวัตกรรมในกล่องหน้าโปรไฟล์นักวิจัย
         function renderProfileInnovations(profName) {
             const innoContainer = document.getElementById('innovation-list');
             if (!innoContainer) return;
             
-            if (globalInnovationsData.length === 0) {
-                 // กรณียังโหลดไม่เสร็จ หรือโหลดพังไปแล้ว จะปล่อยกล่องให้แสดงสถานะตามที่ Error Handler ทำไว้
-                 return;
-            }
+            if (globalInnovationsData.length === 0) return;
             
             const profInnos = globalInnovationsData.filter(inno => {
                 const mainOwner = (inno['ผู้ผลิตหลัก'] || '').trim();
@@ -611,9 +599,13 @@
             if (profInnos.length === 0) {
                 innoContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-folder-open text-3xl mb-3 text-gray-200"></i>ไม่มีข้อมูลนวัตกรรม</div>`;
             } else {
-                let innoHtml = '<div class="space-y-2">';
+                let innoHtml = '<div class="w-full flex flex-col">';
                 profInnos.forEach(inno => {
                     const title = inno['ชื่อผลงาน'] || 'ไม่ระบุชื่อ';
+                    const year = inno['ปีของผลงาน'] || '-';
+                    const type = inno['ประเภท'] || 'ไม่ระบุประเภท';
+                    const reqNo = inno['เลขคำขอ'] || '-';
+                    const patNo = inno['เลขสิทธิบัตร'] || '';
                     const mainOwner = (inno['ผู้ผลิตหลัก'] || '').trim();
                     const isMain = (mainOwner === profName);
                     
@@ -621,14 +613,28 @@
                         ? `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full border border-emerald-200"><i class="fa-solid fa-star mr-1"></i>เจ้าของหลัก</span>`
                         : `<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full border border-blue-200"><i class="fa-solid fa-user-group mr-1"></i>ผู้ร่วม</span>`;
 
+                    let patHtml = patNo ? ` <span class="text-gray-300 mx-1">|</span> <span class="font-medium text-gray-600">เลขสิทธิบัตร/ลิขสิทธิ์:</span> ${patNo}` : '';
+
                     innoHtml += `
-                        <div class="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors bg-white">
-                            <div class="font-medium text-gray-800 text-[13px] mb-1.5 leading-snug">${title}</div>
+                        <div class="border-b border-gray-100 py-3 pr-2 pl-2 hover:bg-gray-50 transition-colors text-left w-full">
+                            <div class="font-semibold text-gray-800 text-[12px] lg:text-[13px] mb-1 leading-snug">${title}</div>
+                            <div class="text-[11px] lg:text-[12px] text-gray-500 mb-2 leading-relaxed">
+                                <span class="font-medium text-gray-700">${type}</span> <span class="text-gray-400">(${year})</span><br>
+                                <span class="font-medium text-gray-600">เลขคำขอ:</span> ${reqNo} ${patHtml}
+                            </div>
                             <div>${badge}</div>
                         </div>
                     `;
                 });
-                innoHtml += '</div>';
+                
+                // เพิ่มปุ่มลิงก์ไปหน้า All Innovations
+                innoHtml += `
+                    <div class="mt-4 pb-2 text-center">
+                        <button onclick="switchView('innovation')" class="inline-flex items-center gap-1 text-[11px] lg:text-xs text-blue-600 hover:text-blue-800 font-medium px-4 py-2 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors shadow-sm">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> ดูนวัตกรรมทั้งหมด (All Innovations)
+                        </button>
+                    </div>
+                </div>`;
                 innoContainer.innerHTML = innoHtml;
             }
         }
@@ -864,9 +870,6 @@
             }
         }
 
-        // ==========================================
-        // [ฟังก์ชันใหม่] ดึงข้อมูลผลงานคณะ (AF-ID) เพื่อวาดกราฟ
-        // ==========================================
         async function fetchFacultyDataForCharts() {
             const loadingArea = document.getElementById('chart-area-loading');
             const loadingType = document.getElementById('chart-type-loading');
@@ -875,7 +878,6 @@
 
             const startYear = CURRENT_YEAR - 2;
             const query = `AF-ID(60012521) AND AFFIL(Engineering) AND PUBYEAR = ${CURRENT_YEAR}`;
-            // ดึงผลงานล่าสุดของคณะ (จำกัด 200 รายการเพื่อไม่ให้เกิน Limit API แต่เพียงพอสำหรับการดูแนวโน้ม)
             const url = `https://api.elsevier.com/content/search/scopus?query=${encodeURIComponent(query)}&count=200&sort=-coverDate`;
 
             try {
@@ -1142,22 +1144,41 @@
 
             let resultHTML = '';
             if (dataArray.length === 0) {
-                resultHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-search text-3xl mb-2 text-gray-300 block"></i>ไม่พบข้อมูลนวัตกรรม</td></tr>`;
+                resultHTML = `<tr><td colspan="4" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-search text-3xl mb-2 text-gray-300 block"></i>ไม่พบข้อมูลนวัตกรรม</td></tr>`;
             } else {
                 dataArray.forEach(entry => {
                     const title = entry['ชื่อผลงาน'] || 'ไม่มีชื่อผลงาน';
-                    const mainOwner = entry['ผู้ผลิตหลัก'] || '-';
+                    const year = entry['ปีของผลงาน'] || '-';
+                    const type = entry['ประเภท'] || '-';
+                    const reqNo = entry['เลขคำขอ'] || '-';
+                    const patNo = entry['เลขสิทธิบัตร'] || '';
+                    
+                    const mainOwnerRaw = (entry['ผู้ผลิตหลัก'] || '').trim();
+                    const mainOwnerHtml = mainOwnerRaw 
+                        ? `<button onclick="switchToResearcherByName('${mainOwnerRaw}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${mainOwnerRaw}</button>` 
+                        : '-';
+
                     const coOwnersArr = [];
                     for(let i=1; i<=9; i++) {
-                        if(entry[`ผู้ผลิตร่วม ${i}`]) coOwnersArr.push(String(entry[`ผู้ผลิตร่วม ${i}`]).trim());
+                        if(entry[`ผู้ผลิตร่วม ${i}`] && String(entry[`ผู้ผลิตร่วม ${i}`]).trim() !== '') {
+                            const co = String(entry[`ผู้ผลิตร่วม ${i}`]).trim();
+                            coOwnersArr.push(`<button onclick="switchToResearcherByName('${co}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${co}</button>`);
+                        }
                     }
-                    const coOwners = coOwnersArr.length > 0 ? coOwnersArr.join(', ') : '-';
+                    const coOwnersHtml = coOwnersArr.length > 0 ? coOwnersArr.join('<span class="text-gray-300 mx-1">,</span> ') : '-';
+                    
+                    let regInfo = `<span class="font-medium text-gray-600">เลขคำขอ:</span> ${reqNo}`;
+                    if (patNo) regInfo += `<br><span class="font-medium text-gray-600">สิทธิบัตร/ลิขสิทธิ์:</span> ${patNo}`;
                     
                     resultHTML += `
                         <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
-                            <td class="py-3 lg:py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px]">${title}</td>
-                            <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-sm text-emerald-700 font-medium">${mainOwner}</td>
-                            <td class="py-3 lg:py-4 text-[11px] lg:text-sm text-gray-500">${coOwners}</td>
+                            <td class="py-3 lg:py-4 pr-4 pl-2">
+                                <div class="font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px] mb-1">${title}</div>
+                                <div class="text-[11px] lg:text-xs text-gray-500"><span class="font-medium text-gray-700">${type}</span> (${year})</div>
+                            </td>
+                            <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-xs text-gray-500 leading-relaxed">${regInfo}</td>
+                            <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-xs">${mainOwnerHtml}</td>
+                            <td class="py-3 lg:py-4 text-[11px] lg:text-xs leading-relaxed">${coOwnersHtml}</td>
                         </tr>
                     `;
                 });
@@ -1165,7 +1186,44 @@
             container.innerHTML = resultHTML;
         }
 
-        // ฟังก์ชันช่วยเหลือระบบค้นหา
+        // 🟢 ฟังก์ชันค้นหาและสลับไปยังโปรไฟล์นักวิจัยจากชื่อ-นามสกุล
+        function switchToResearcherByName(nameText) {
+            // ลบคำนำหน้าชื่อออกเพื่อให้ค้นหาเจอได้ง่ายขึ้น แม้จะพิมพ์มาพร้อมคำนำหน้า
+            const cleanTargetName = nameText.replace(/รศ\.|ผศ\.|ดร\.|ศ\.|อ\.|นาย|นางสาว|นาง|Assoc\.Prof\./g, '').trim().toLowerCase();
+            
+            const prof = globalResearchersData.find(p => {
+                const cleanPName = (p['ชื่อ-สกุล'] || '').replace(/รศ\.|ผศ\.|ดร\.|ศ\.|อ\.|นาย|นางสาว|นาง/g, '').trim().toLowerCase();
+                return cleanPName !== '' && (cleanPName.includes(cleanTargetName) || cleanTargetName.includes(cleanPName));
+            });
+
+            if (prof) {
+                switchView('researchers');
+                
+                // รีเซ็ตการค้นหาเพื่อให้รายการนักวิจัยโชว์ครบทุกคน
+                document.getElementById('search-input-desktop').value = '';
+                document.getElementById('search-input-mobile').value = '';
+                performSearch(''); 
+
+                // หน่วงเวลาเล็กน้อยเพื่อให้ DOM วาดรายการนักวิจัยเสร็จ
+                setTimeout(() => {
+                    const listContainer = document.getElementById('researcher-list');
+                    let targetElement = null;
+                    for (let child of listContainer.children) {
+                        if (child.innerText.includes(prof['ชื่อ-สกุล'])) { 
+                            targetElement = child; 
+                            // เลื่อน Scrollbar ของแถบด้านข้างไปที่ชื่อนักวิจัยคนนั้น
+                            child.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            break; 
+                        }
+                    }
+                    updateProfile(prof, targetElement, true);
+                }, 50);
+
+            } else {
+                alert(`ไม่พบข้อมูลโปรไฟล์ของ "${nameText}" ในระบบฐานข้อมูลนักวิจัย`);
+            }
+        }
+
         function filterPublicationsTable(searchTerm) {
             if (globalAllPublicationsData.length === 0) return;
             if (searchTerm === '') { renderPublicationsTable(globalAllPublicationsData); return; }
@@ -1188,13 +1246,16 @@
             const filteredInnos = globalInnovationsData.filter(entry => {
                 const title = (entry['ชื่อผลงาน'] || '').toLowerCase();
                 const mainOwner = (entry['ผู้ผลิตหลัก'] || '').toLowerCase();
+                const type = (entry['ประเภท'] || '').toLowerCase();
+                const year = (entry['ปีของผลงาน'] || '').toLowerCase();
+                
                 const coOwnersArr = [];
                 for(let i=1; i<=9; i++) {
                     if(entry[`ผู้ผลิตร่วม ${i}`]) coOwnersArr.push(String(entry[`ผู้ผลิตร่วม ${i}`]).toLowerCase());
                 }
                 const coOwnersStr = coOwnersArr.join(' ');
                 
-                return title.includes(searchTerm) || mainOwner.includes(searchTerm) || coOwnersStr.includes(searchTerm);
+                return title.includes(searchTerm) || mainOwner.includes(searchTerm) || coOwnersStr.includes(searchTerm) || type.includes(searchTerm) || year.includes(searchTerm);
             });
 
             renderAllInnovationsTable(filteredInnos);
