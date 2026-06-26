@@ -218,11 +218,19 @@
                     <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start lg:items-center mb-4 pb-3 border-b flex-shrink-0 gap-2">
                         <h3 class="text-base lg:text-lg font-bold text-gray-800"><i class="fa-solid fa-lightbulb text-red-700 mr-2"></i>ผลงานนวัตกรรมทั้งหมด (All Innovations)</h3>
                     </div>
-                    <div class="flex-1 flex items-center justify-center text-gray-400">
-                        <div class="text-center">
-                            <i class="fa-solid fa-person-digging text-4xl mb-3 text-gray-300"></i>
-                            <p>หน้าแสดงผลงานนวัตกรรมรวม (รอนำเข้าข้อมูล)</p>
-                        </div>
+                    <div class="overflow-y-auto overflow-x-auto flex-1 pr-1 lg:pr-2">
+                        <table class="w-full text-sm text-left border-collapse min-w-[600px] lg:min-w-full">
+                            <thead class="sticky top-0 bg-white z-10 shadow-sm shadow-gray-50">
+                                <tr class="text-gray-400 border-b border-gray-100 text-xs lg:text-sm">
+                                    <th class="pb-3 font-medium pl-2 w-3/5">ชื่อผลงานนวัตกรรม</th>
+                                    <th class="pb-3 font-medium w-1/4">เจ้าของหลัก</th>
+                                    <th class="pb-3 font-medium w-20">ผู้ร่วม</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-faculty-inno-list" class="divide-y divide-gray-50">
+                                <tr><td colspan="3" class="py-10 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังรอการโหลดข้อมูล...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -367,6 +375,10 @@
         // 2. Data & API Configuration
         // ==========================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbzMQCzrpCaXKUyRoZjBF0he-8OrAgKPtmK1zIEiTer-G4kGhDWrvR-3HrEech436VKu/exec';
+        
+        // 🟢 วาง URL API สำหรับดึงข้อมูลนวัตกรรม ตรงนี้ครับ 🟢
+        const INNO_API_URL = 'https://script.google.com/macros/s/AKfycbw4-5fJnFKAv663qUGzZ4ae1ZlqWN0nlzjNafvnzDRa_rjfC9gyWwqb3e0zidWmwMrA/exec'; 
+
         const APP_NAME = 'ENG_Research_DATA-876276269'; 
         const TABLE_NAME = 'นักวิจัย'; 
         const SCOPUS_API_KEY = '233469672124ca85d252ec13abe9ced5';
@@ -374,6 +386,7 @@
         const CURRENT_YEAR = new Date().getFullYear(); 
         
         let globalResearchersData = []; 
+        let globalInnovationsData = []; // ตัวแปรเก็บข้อมูลนวัตกรรม
         let currentActiveScopusId = null; 
         let globalAllPublicationsData = []; 
         let isFetchingPublications = false; 
@@ -420,15 +433,26 @@
         mobileSearchInput.addEventListener('input', (e) => performSearch(e.target.value));
 
         // ==========================================
-        // 4. โหลดข้อมูลอาจารย์
+        // 4. โหลดข้อมูลอาจารย์ และ นวัตกรรม
         // ==========================================
         async function loadData() {
             try {
+                // โหลดนักวิจัย
                 const response = await fetch(API_URL);
                 globalResearchersData = await response.json(); 
                 renderResearcherList(globalResearchersData);
                 
                 loadAllFacultyPublicationsBackground();
+
+                // โหลดนวัตกรรม ถ้ามีการใส่ URL แล้ว
+                if (INNO_API_URL !== 'ใส่_URL_API_นวัตกรรมที่นี่') {
+                    const innoResponse = await fetch(INNO_API_URL);
+                    globalInnovationsData = await innoResponse.json();
+                    renderAllInnovationsTable(globalInnovationsData);
+                } else {
+                    const innoContainer = document.getElementById('all-faculty-inno-list');
+                    if(innoContainer) innoContainer.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-red-400 bg-red-50 rounded-lg text-sm">กรุณาใส่ URL API นวัตกรรม ในตัวแปร INNO_API_URL</td></tr>`;
+                }
 
             } catch (error) {
                 const listContainer = document.getElementById('researcher-list');
@@ -474,10 +498,11 @@
         }
 
         // ==========================================
-        // 5. โปรไฟล์ส่วนบุคคล
+        // 5. โปรไฟล์ส่วนบุคคล (รองรับการแสดงนวัตกรรม)
         // ==========================================
         function updateProfile(person, clickedElement, isUserClick = false) {
-            document.getElementById('prof-name-th').innerText = person['ชื่อ-สกุล'] || '-';
+            const profName = person['ชื่อ-สกุล'] || '';
+            document.getElementById('prof-name-th').innerText = profName || '-';
             document.getElementById('prof-name-en').innerText = person['Name'] || '-';
             
             const title = person['ตำแหน่งทางวิชาการ'] || '';
@@ -525,7 +550,45 @@
                 }
             }
 
-            document.getElementById('innovation-list').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-lightbulb text-3xl mb-3 text-gray-200"></i>รอเพิ่มข้อมูลนวัตกรรม...</div>`;
+            // --- ส่วนจัดการการแสดงผลนวัตกรรมของนักวิจัยคนนั้นๆ ---
+            const innoContainer = document.getElementById('innovation-list');
+            if (INNO_API_URL === 'ใส่_URL_API_นวัตกรรมที่นี่') {
+                innoContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-lightbulb text-3xl mb-3 text-gray-200"></i>รอเพิ่ม URL ข้อมูลนวัตกรรม...</div>`;
+            } else if (globalInnovationsData.length === 0) {
+                innoContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-gray-200"></i>กำลังโหลดข้อมูล...</div>`;
+            } else {
+                // ค้นหานวัตกรรมที่ตรงกับชื่อ
+                const profInnos = globalInnovationsData.filter(inno => {
+                    const mainOwner = (inno['เจ้าของหลัก'] || '').trim();
+                    const coOwners = (inno['ผู้ร่วม'] || '').split(',').map(s => s.trim());
+                    return mainOwner === profName || coOwners.includes(profName);
+                });
+
+                if (profInnos.length === 0) {
+                    innoContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-folder-open text-3xl mb-3 text-gray-200"></i>ไม่มีข้อมูลนวัตกรรม</div>`;
+                } else {
+                    let innoHtml = '<div class="space-y-2">';
+                    profInnos.forEach(inno => {
+                        const title = inno['ชื่อผลงาน'] || 'ไม่ระบุชื่อ';
+                        const mainOwner = (inno['เจ้าของหลัก'] || '').trim();
+                        const isMain = (mainOwner === profName);
+                        
+                        // ป้ายกำกับ (Badge) แยกสี
+                        const badge = isMain
+                            ? `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full border border-emerald-200"><i class="fa-solid fa-star mr-1"></i>เจ้าของหลัก</span>`
+                            : `<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full border border-blue-200"><i class="fa-solid fa-user-group mr-1"></i>ผู้ร่วม</span>`;
+
+                        innoHtml += `
+                            <div class="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors bg-white">
+                                <div class="font-medium text-gray-800 text-[13px] mb-1.5 leading-snug">${title}</div>
+                                <div>${badge}</div>
+                            </div>
+                        `;
+                    });
+                    innoHtml += '</div>';
+                    innoContainer.innerHTML = innoHtml;
+                }
+            }
 
             fetchScopusMetrics(scopusId);
             fetchScopusPublications(scopusId);
@@ -1035,6 +1098,34 @@
             }
         }
 
+        // ==========================================
+        // 9. ฟังก์ชันเรนเดอร์ตารางนวัตกรรมทั้งหมด (หน้า Innovation)
+        // ==========================================
+        function renderAllInnovationsTable(dataArray) {
+            const container = document.getElementById('all-faculty-inno-list');
+            if(!container) return;
+
+            let resultHTML = '';
+            if (dataArray.length === 0) {
+                resultHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-search text-3xl mb-2 text-gray-300 block"></i>ไม่พบข้อมูลนวัตกรรม</td></tr>`;
+            } else {
+                dataArray.forEach(entry => {
+                    const title = entry['ชื่อผลงาน'] || 'ไม่มีชื่อผลงาน';
+                    const mainOwner = entry['เจ้าของหลัก'] || '-';
+                    const coOwners = entry['ผู้ร่วม'] || '-';
+                    
+                    resultHTML += `
+                        <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
+                            <td class="py-3 lg:py-4 pr-4 pl-2 font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px]">${title}</td>
+                            <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-sm text-emerald-700 font-medium">${mainOwner}</td>
+                            <td class="py-3 lg:py-4 text-[11px] lg:text-sm text-gray-500">${coOwners}</td>
+                        </tr>
+                    `;
+                });
+            }
+            container.innerHTML = resultHTML;
+        }
+
         // ฟังก์ชันช่วยเหลือระบบค้นหา
         function filterPublicationsTable(searchTerm) {
             if (globalAllPublicationsData.length === 0) return;
@@ -1052,13 +1143,18 @@
         }
 
         function filterInnovationsTable(searchTerm) {
-            const innoContainer = document.getElementById('all-faculty-inno-list');
-            if(!innoContainer) return;
-            if (searchTerm !== '') {
-                innoContainer.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-gray-500 bg-gray-50 rounded-lg text-sm"><i class="fa-solid fa-search text-3xl mb-2 text-gray-300 block"></i>ไม่พบนวัตกรรมที่ค้นหา</td></tr>`;
-            } else {
-                innoContainer.innerHTML = `<tr><td colspan="3" class="py-16 text-center text-gray-400"><i class="fa-solid fa-person-digging text-4xl mb-3 text-gray-300 block"></i><p>รอการนำเข้าข้อมูลนวัตกรรมจากฐานข้อมูล</p></td></tr>`;
-            }
+            if (globalInnovationsData.length === 0) return;
+            if (searchTerm === '') { renderAllInnovationsTable(globalInnovationsData); return; }
+
+            const filteredInnos = globalInnovationsData.filter(entry => {
+                const title = (entry['ชื่อผลงาน'] || '').toLowerCase();
+                const mainOwner = (entry['เจ้าของหลัก'] || '').toLowerCase();
+                const coOwners = (entry['ผู้ร่วม'] || '').toLowerCase();
+                
+                return title.includes(searchTerm) || mainOwner.includes(searchTerm) || coOwners.includes(searchTerm);
+            });
+
+            renderAllInnovationsTable(filteredInnos);
         }
 
         function switchToResearcher(scopusId) {
