@@ -484,6 +484,16 @@
             }
         }
 
+        // 🟢 ฟังก์ชันช่วยเช็คว่าชื่อนักวิจัยมีในระบบหรือไม่
+        function checkResearcherExists(nameText) {
+            if(!nameText || nameText === '-') return false;
+            const cleanTargetName = nameText.replace(/รศ\.|ผศ\.|ดร\.|ศ\.|อ\.|นาย|นางสาว|นาง|Assoc\.Prof\./g, '').trim().toLowerCase();
+            return globalResearchersData.some(p => {
+                const cleanPName = (p['ชื่อ-สกุล'] || '').replace(/รศ\.|ผศ\.|ดร\.|ศ\.|อ\.|นาย|นางสาว|นาง/g, '').trim().toLowerCase();
+                return cleanPName !== '' && (cleanPName.includes(cleanTargetName) || cleanTargetName.includes(cleanPName));
+            });
+        }
+
         function renderResearcherList(dataToRender) {
             const listContainer = document.getElementById('researcher-list');
             if(!listContainer) return;
@@ -597,15 +607,21 @@
             });
 
             if (profInnos.length === 0) {
-                innoContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10"><i class="fa-solid fa-folder-open text-3xl mb-3 text-gray-200"></i>ไม่มีข้อมูลนวัตกรรม</div>`;
+                innoContainer.className = "flex flex-col items-center justify-center h-full text-gray-400 text-sm py-10";
+                innoContainer.innerHTML = `<i class="fa-solid fa-folder-open text-3xl mb-3 text-gray-200"></i>ไม่มีข้อมูลนวัตกรรม`;
             } else {
+                // เอา class จัดกึ่งกลางออก เพื่อให้รายการเรียงชิดขอบบนลงมา
+                innoContainer.className = "flex flex-col w-full"; 
+                
                 let innoHtml = '<div class="w-full flex flex-col">';
                 profInnos.forEach(inno => {
                     const title = inno['ชื่อผลงาน'] || 'ไม่ระบุชื่อ';
                     const year = inno['ปีของผลงาน'] || '-';
-                    const type = inno['ประเภท'] || 'ไม่ระบุประเภท';
-                    const reqNo = inno['เลขคำขอ'] || '-';
+                    const group = (inno['กลุ่ม'] || '').trim();
+                    const type = inno['ประเภท'] || '';
+                    const reqNo = inno['เลขคำขอ'] || '';
                     const patNo = inno['เลขสิทธิบัตร'] || '';
+                    
                     const mainOwner = (inno['ผู้ผลิตหลัก'] || '').trim();
                     const isMain = (mainOwner === profName);
                     
@@ -613,23 +629,27 @@
                         ? `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full border border-emerald-200"><i class="fa-solid fa-star mr-1"></i>เจ้าของหลัก</span>`
                         : `<span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full border border-blue-200"><i class="fa-solid fa-user-group mr-1"></i>ผู้ร่วม</span>`;
 
-                    let patHtml = patNo ? ` <span class="text-gray-300 mx-1">|</span> <span class="font-medium text-gray-600">เลขสิทธิบัตร/ลิขสิทธิ์:</span> ${patNo}` : '';
+                    let infoHtml = '';
+                    if (group === 'IP') {
+                        let patOrReq = patNo ? `<span class="font-medium text-gray-600">เลขสิทธิบัตร:</span> ${patNo}` : (reqNo ? `<span class="font-medium text-gray-600">เลขคำขอ:</span> ${reqNo}` : '');
+                        infoHtml = `<span class="font-medium text-gray-700">${type}</span> <span class="text-gray-400">(${year})</span><br>${patOrReq}`;
+                    } else {
+                        infoHtml = `<span class="font-medium text-gray-700">${group}</span> <span class="text-gray-400">(${year})</span>`;
+                    }
 
                     innoHtml += `
                         <div class="border-b border-gray-100 py-3 pr-2 pl-2 hover:bg-gray-50 transition-colors text-left w-full">
                             <div class="font-semibold text-gray-800 text-[12px] lg:text-[13px] mb-1 leading-snug">${title}</div>
                             <div class="text-[11px] lg:text-[12px] text-gray-500 mb-2 leading-relaxed">
-                                <span class="font-medium text-gray-700">${type}</span> <span class="text-gray-400">(${year})</span><br>
-                                <span class="font-medium text-gray-600">เลขคำขอ:</span> ${reqNo} ${patHtml}
+                                ${infoHtml}
                             </div>
                             <div>${badge}</div>
                         </div>
                     `;
                 });
                 
-                // เพิ่มปุ่มลิงก์ไปหน้า All Innovations
                 innoHtml += `
-                    <div class="mt-4 pb-2 text-center">
+                    <div class="mt-4 pb-2 text-center w-full">
                         <button onclick="switchView('innovation')" class="inline-flex items-center gap-1 text-[11px] lg:text-xs text-blue-600 hover:text-blue-800 font-medium px-4 py-2 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors shadow-sm">
                             <i class="fa-solid fa-arrow-up-right-from-square"></i> ดูนวัตกรรมทั้งหมด (All Innovations)
                         </button>
@@ -1149,32 +1169,54 @@
                 dataArray.forEach(entry => {
                     const title = entry['ชื่อผลงาน'] || 'ไม่มีชื่อผลงาน';
                     const year = entry['ปีของผลงาน'] || '-';
+                    const group = (entry['กลุ่ม'] || '').trim();
                     const type = entry['ประเภท'] || '-';
-                    const reqNo = entry['เลขคำขอ'] || '-';
+                    const reqNo = entry['เลขคำขอ'] || '';
                     const patNo = entry['เลขสิทธิบัตร'] || '';
                     
                     const mainOwnerRaw = (entry['ผู้ผลิตหลัก'] || '').trim();
-                    const mainOwnerHtml = mainOwnerRaw 
-                        ? `<button onclick="switchToResearcherByName('${mainOwnerRaw}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${mainOwnerRaw}</button>` 
-                        : '-';
+                    let mainOwnerHtml = '-';
+                    if (mainOwnerRaw) {
+                        if (checkResearcherExists(mainOwnerRaw)) {
+                            mainOwnerHtml = `<button onclick="switchToResearcherByName('${mainOwnerRaw}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${mainOwnerRaw}</button>`;
+                        } else {
+                            mainOwnerHtml = `<span class="text-gray-700">${mainOwnerRaw}</span>`;
+                        }
+                    }
 
                     const coOwnersArr = [];
                     for(let i=1; i<=9; i++) {
                         if(entry[`ผู้ผลิตร่วม ${i}`] && String(entry[`ผู้ผลิตร่วม ${i}`]).trim() !== '') {
                             const co = String(entry[`ผู้ผลิตร่วม ${i}`]).trim();
-                            coOwnersArr.push(`<button onclick="switchToResearcherByName('${co}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${co}</button>`);
+                            if (checkResearcherExists(co)) {
+                                coOwnersArr.push(`<button onclick="switchToResearcherByName('${co}')" class="text-blue-600 hover:text-red-700 hover:underline font-medium text-left focus:outline-none transition-colors">${co}</button>`);
+                            } else {
+                                coOwnersArr.push(`<span class="text-gray-700">${co}</span>`);
+                            }
                         }
                     }
                     const coOwnersHtml = coOwnersArr.length > 0 ? coOwnersArr.join('<span class="text-gray-300 mx-1">,</span> ') : '-';
                     
-                    let regInfo = `<span class="font-medium text-gray-600">เลขคำขอ:</span> ${reqNo}`;
-                    if (patNo) regInfo += `<br><span class="font-medium text-gray-600">สิทธิบัตร/ลิขสิทธิ์:</span> ${patNo}`;
-                    
+                    let typeAndYearHtml = '';
+                    let regInfo = '-';
+
+                    if (group === 'IP') {
+                        typeAndYearHtml = `<span class="font-medium text-gray-700">${type}</span> (${year})`;
+                        let reqHtml = reqNo ? `<span class="font-medium text-gray-600">เลขคำขอ:</span> ${reqNo}` : '';
+                        let patHtml = patNo ? `<br><span class="font-medium text-gray-600">สิทธิบัตร/ลิขสิทธิ์:</span> ${patNo}` : '';
+                        
+                        if (reqHtml || patHtml) {
+                            regInfo = [reqHtml, patHtml].filter(Boolean).join('');
+                        }
+                    } else {
+                        typeAndYearHtml = `<span class="font-medium text-gray-700">${group}</span> (${year})`;
+                    }
+
                     resultHTML += `
                         <tr class="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
                             <td class="py-3 lg:py-4 pr-4 pl-2">
                                 <div class="font-medium text-gray-800 leading-relaxed text-[12px] lg:text-[13.5px] mb-1">${title}</div>
-                                <div class="text-[11px] lg:text-xs text-gray-500"><span class="font-medium text-gray-700">${type}</span> (${year})</div>
+                                <div class="text-[11px] lg:text-xs text-gray-500">${typeAndYearHtml}</div>
                             </td>
                             <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-xs text-gray-500 leading-relaxed">${regInfo}</td>
                             <td class="py-3 lg:py-4 pr-4 text-[11px] lg:text-xs">${mainOwnerHtml}</td>
@@ -1188,7 +1230,6 @@
 
         // 🟢 ฟังก์ชันค้นหาและสลับไปยังโปรไฟล์นักวิจัยจากชื่อ-นามสกุล
         function switchToResearcherByName(nameText) {
-            // ลบคำนำหน้าชื่อออกเพื่อให้ค้นหาเจอได้ง่ายขึ้น แม้จะพิมพ์มาพร้อมคำนำหน้า
             const cleanTargetName = nameText.replace(/รศ\.|ผศ\.|ดร\.|ศ\.|อ\.|นาย|นางสาว|นาง|Assoc\.Prof\./g, '').trim().toLowerCase();
             
             const prof = globalResearchersData.find(p => {
@@ -1199,19 +1240,16 @@
             if (prof) {
                 switchView('researchers');
                 
-                // รีเซ็ตการค้นหาเพื่อให้รายการนักวิจัยโชว์ครบทุกคน
                 document.getElementById('search-input-desktop').value = '';
                 document.getElementById('search-input-mobile').value = '';
                 performSearch(''); 
 
-                // หน่วงเวลาเล็กน้อยเพื่อให้ DOM วาดรายการนักวิจัยเสร็จ
                 setTimeout(() => {
                     const listContainer = document.getElementById('researcher-list');
                     let targetElement = null;
                     for (let child of listContainer.children) {
                         if (child.innerText.includes(prof['ชื่อ-สกุล'])) { 
                             targetElement = child; 
-                            // เลื่อน Scrollbar ของแถบด้านข้างไปที่ชื่อนักวิจัยคนนั้น
                             child.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             break; 
                         }
@@ -1248,6 +1286,7 @@
                 const mainOwner = (entry['ผู้ผลิตหลัก'] || '').toLowerCase();
                 const type = (entry['ประเภท'] || '').toLowerCase();
                 const year = (entry['ปีของผลงาน'] || '').toLowerCase();
+                const group = (entry['กลุ่ม'] || '').toLowerCase();
                 
                 const coOwnersArr = [];
                 for(let i=1; i<=9; i++) {
@@ -1255,7 +1294,7 @@
                 }
                 const coOwnersStr = coOwnersArr.join(' ');
                 
-                return title.includes(searchTerm) || mainOwner.includes(searchTerm) || coOwnersStr.includes(searchTerm) || type.includes(searchTerm) || year.includes(searchTerm);
+                return title.includes(searchTerm) || mainOwner.includes(searchTerm) || coOwnersStr.includes(searchTerm) || type.includes(searchTerm) || year.includes(searchTerm) || group.includes(searchTerm);
             });
 
             renderAllInnovationsTable(filteredInnos);
